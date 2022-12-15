@@ -15,7 +15,7 @@ import java.util.Map;
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private static int id = 1;
+    private int id = 1;
     private Map<Integer,User> users = new HashMap<>();
 
     @GetMapping
@@ -46,7 +46,7 @@ public class UserController {
                user.setName(user.getLogin());
             }
             user.setId(id);
-            users.put(id, user);
+            users.put(user.getId(), user);
             id++;
             log.info("Добавлен новый юзер: {}", user.getName());
             return user;
