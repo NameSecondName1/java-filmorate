@@ -8,17 +8,19 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping({"/films"})
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private static int id = 1;
-    private Map<Integer, Film> films = new HashMap<>();
+    private Set<Film> films = new HashSet<>();
 
     @GetMapping
-    public Map<Integer, Film> findAll() {
+    public Set<Film> findAll() {
         log.debug("Текущее количество фильмов: {}", films.size());
         return films;
     }
@@ -39,9 +41,9 @@ public class FilmController {
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         } else {
             film.setId(id);
-            films.put(id, film);
+            films.add(film);
             id++;
-            log.info("Добавлен новый фильм: {}", film.getName());
+            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
             return film;
         }
 
@@ -49,12 +51,19 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.debug("Фильм с id = {} успешно изменен.",film.getId());
-        } else {
+        Film targetFilm = null;
+        for (Film elem: films) {
+            if (film.getId() == elem.getId()) {
+                targetFilm = elem;
+            }
+        }
+        if (targetFilm == null) {
             log.debug("Фильма с id = {} не существует.",film.getId());
             throw new ValidationException("Фильма с выбранным id не существует.");
+        } else {
+            films.remove(targetFilm);
+            films.add(film);
+            log.debug("Фильм с id = {} успешно изменен.",film.getId());
         }
         return film;
     }
