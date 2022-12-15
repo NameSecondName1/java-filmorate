@@ -77,8 +77,8 @@ public class FilmControllerTest {
     @Test
     public void testGoodUpdateFilm() throws ValidationException {
         filmController.create(testFilm);
-        Film updateFilm = Film.builder().id(testFilm.getId()).name("testName").description("testDescr")
-                .releaseDate(LocalDate.of(2000,12,12)).duration(120).build();
+        Film updateFilm = Film.builder().id(testFilm.getId()).name("testNameCHANGED").description("testDescrCHANGED")
+                .releaseDate(LocalDate.of(1990,12,12)).duration(100).build();
         filmController.update(updateFilm);
         Set<Film> testFilms = new HashSet<>();
         testFilms.add(updateFilm);
