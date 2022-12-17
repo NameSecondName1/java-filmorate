@@ -8,21 +8,19 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping({"/films"})
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private static int id = 1;
-    private Set<Film> films = new HashSet<>();
+    private static long id = 1;
+    private final Map<Long, Film> films = new HashMap<>();
 
     @GetMapping
-    public Set<Film> findAll() {
+    public Film[] findAll() {
         log.debug("Текущее количество фильмов: {}", films.size());
-        return films;
+        return films.values().toArray(new Film[0]);
     }
 
     @PostMapping
@@ -40,10 +38,14 @@ public class FilmController {
             log.debug("У фильма {} некорректно указана длительность: {}, min = 1",film.getName(),film.getDuration());
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         } else {
-            film.setId(id);
-            films.add(film);
-            id++;
-            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
+            if (film.getId() == 0) {
+                film.setId(id);
+                log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
+                id++;
+            } else {
+                log.info("Фильм с id = {} успешно обновлен.",film.getId());
+            }
+            films.put(film.getId(), film);
             return film;
         }
 
@@ -51,19 +53,11 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film film) throws ValidationException {
-        Film targetFilm = null;
-        for (Film elem: films) {
-            if (film.getId() == elem.getId()) {
-                targetFilm = elem;
-            }
-        }
-        if (targetFilm == null) {
+        if (films.containsKey(film.getId())) {
+            create(film);
+        } else {
             log.debug("Фильма с id = {} не существует.",film.getId());
             throw new ValidationException("Фильма с выбранным id не существует.");
-        } else {
-            films.remove(targetFilm);
-            films.add(film);
-            log.debug("Фильм с id = {} успешно изменен.",film.getId());
         }
         return film;
     }
