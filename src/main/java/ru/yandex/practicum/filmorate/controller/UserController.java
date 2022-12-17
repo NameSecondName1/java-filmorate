@@ -26,72 +26,48 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody User user) throws ValidationException {
-         if ((user.getEmail() == null)||(user.getEmail().equals(""))) {
-             log.debug("У пользователя {} указан пустой e-mail.",user.getName());
-            throw new ValidationException("e-mail не должен быть пустым.");
-        } else if (!(user.getEmail().contains("@"))){
-             log.debug("У пользователя {} некорректно указан e-mail: {}",user.getName(),user.getEmail());
-            throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
-        } else if ((user.getLogin() == null) || (user.getLogin().equals(""))) {
-             log.debug("Пользователь пытается зарегестрироваться с пустым логином.");
-            throw new ValidationException("Логин не должен быть пустым.");
-        } else if (user.getLogin().contains(" ")) {
-             log.debug("У пользователя c id = {} некорректно указан логин: {}. Пробелы недопустимы.",user.getId(), user.getLogin());
-            throw new ValidationException("Логин не должен содержать пробелы.");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-             log.debug("Пользователь {}, похоже, из будущего! Указанная дата рождения: {}.",user.getName(),user.getBirthday());
-            throw new ValidationException("Дата рождения не может быть в будущем.");
-        } else {
+        if (isValid(user)) {
             if ((user.getName() == null)||(user.getName().isBlank())) {
-               user.setName(user.getLogin());
+                user.setName(user.getLogin());
             }
-            if (user.getId() == 0) {
-                user.setId(id);
-                log.info("Добавлен новый юзер: {}, присвоенный ему id = {}.", user.getName(),user.getId());
-                id++;
-            } else {
-                log.info("Юзер с id = {} успешно обновлен.",user.getId());
-            }
+            user.setId(id);
+            log.info("Добавлен новый юзер: {}, присвоенный ему id = {}.", user.getName(),user.getId());
+            id++;
             users.put(user.getId(), user);
-            return user;
         }
+        return user;
     }
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
-     /*       if (users.containsKey(user.getId())) {
-            if ((user.getEmail() == null)||(user.getEmail().equals(""))) {
-                log.debug("У пользователя {} указан пустой e-mail.",user.getName());
-                throw new ValidationException("e-mail не должен быть пустым.");
-            } else if (!(user.getEmail().contains("@"))){
-                log.debug("У пользователя {} некорректно указан e-mail: {}",user.getName(),user.getEmail());
-                throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
-            } else if ((user.getLogin() == null) || (user.getLogin().equals(""))) {
-                log.debug("Пользователь пытается зарегестрироваться с пустым логином.");
-                throw new ValidationException("Логин не должен быть пустым.");
-            } else if (user.getLogin().contains(" ")) {
-                log.debug("У пользователя c id = {} некорректно указан логин: {}. Пробелы недопустимы.",user.getId(), user.getLogin());
-                throw new ValidationException("Логин не должен содержать пробелы.");
-            } else if (user.getBirthday().isAfter(LocalDate.now())) {
-                log.debug("Пользователь {}, похоже, из будущего! Указанная дата рождения: {}.",user.getName(),user.getBirthday());
-                throw new ValidationException("Дата рождения не может быть в будущем.");
-            } else {
-                if ((user.getName() == null)||(user.getName().isBlank())) {
-                    user.setName(user.getLogin());
-                }
-                users.put(user.getId(), user);
-                log.info("Юзер с id = {} успешно обновлен.",user.getId());
-            }
-        } else {
-            log.debug("Пользователя с id = {} не существует.",user.getId());
-            throw new ValidationException("Пользователя с выбранным id не существует.");
-        }*/
         if (users.containsKey(user.getId())) {
-            create(user);
+            log.info("Юзер с id = {} успешно обновлен.",user.getId());
+            users.put(user.getId(), user);
         } else {
             log.debug("Пользователя с id = {} не существует.",user.getId());
             throw new ValidationException("Пользователя с выбранным id не существует.");
         }
         return user;
+    }
+
+    public boolean isValid (User user) {
+        if ((user.getEmail() == null)||(user.getEmail().equals(""))) {
+            log.debug("У пользователя {} указан пустой e-mail.",user.getName());
+            throw new ValidationException("e-mail не должен быть пустым.");
+        } else if (!(user.getEmail().contains("@"))){
+            log.debug("У пользователя {} некорректно указан e-mail: {}",user.getName(),user.getEmail());
+            throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
+        } else if ((user.getLogin() == null) || (user.getLogin().equals(""))) {
+            log.debug("Пользователь пытается зарегестрироваться с пустым логином.");
+            throw new ValidationException("Логин не должен быть пустым.");
+        } else if (user.getLogin().contains(" ")) {
+            log.debug("У пользователя c id = {} некорректно указан логин: {}. Пробелы недопустимы.",user.getId(), user.getLogin());
+            throw new ValidationException("Логин не должен содержать пробелы.");
+        } else if (user.getBirthday().isAfter(LocalDate.now())) {
+            log.debug("Пользователь {}, похоже, из будущего! Указанная дата рождения: {}.",user.getName(),user.getBirthday());
+            throw new ValidationException("Дата рождения не может быть в будущем.");
+        } else {
+            return true;
+        }
     }
 }

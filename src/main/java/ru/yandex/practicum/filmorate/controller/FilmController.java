@@ -25,6 +25,30 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) throws ValidationException {
+        if (isValid(film)) {
+            film.setId(id);
+            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
+            id++;
+            films.put(film.getId(), film);
+        }
+            return film;
+    }
+
+    @PutMapping
+    public Film update(@RequestBody Film film) throws ValidationException {
+        if (films.containsKey(film.getId())) {
+            if (isValid(film)) {
+                log.info("Фильм с id = {} успешно обновлен.",film.getId());
+                films.put(film.getId(), film);
+            }
+        } else {
+            log.debug("Фильма с id = {} не существует.",film.getId());
+            throw new ValidationException("Фильма с выбранным id не существует.");
+        }
+        return film;
+    }
+
+    public boolean isValid(Film film) {
         if ((film.getName() == null)||(film.getName().equals(""))) {
             log.debug("Фильм содержит пустое название.");
             throw new ValidationException("Название не может быть пустым.");
@@ -38,27 +62,7 @@ public class FilmController {
             log.debug("У фильма {} некорректно указана длительность: {}, min = 1",film.getName(),film.getDuration());
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         } else {
-            if (film.getId() == 0) {
-                film.setId(id);
-                log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
-                id++;
-            } else {
-                log.info("Фильм с id = {} успешно обновлен.",film.getId());
-            }
-            films.put(film.getId(), film);
-            return film;
+            return true;
         }
-
-    }
-
-    @PutMapping
-    public Film update(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
-            create(film);
-        } else {
-            log.debug("Фильма с id = {} не существует.",film.getId());
-            throw new ValidationException("Фильма с выбранным id не существует.");
-        }
-        return film;
     }
 }
