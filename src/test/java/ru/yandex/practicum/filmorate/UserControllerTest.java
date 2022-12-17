@@ -5,16 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserControllerTest {
     UserController userController;
@@ -28,7 +26,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetUsers() throws ValidationException {
-        Set<User> testUsers = new HashSet<>();
+        List<User> testUsers = new ArrayList<>();
         assertEquals(userController.findAll(), testUsers);
         testUsers.add(testUser);
         userController.create(testUser);
@@ -101,7 +99,7 @@ public class UserControllerTest {
         User updateUser = User.builder().id(testUser.getId()).email("test@mailCHANGED").login("testLoginGHANGED")
                 .birthday(LocalDate.of(1990,12,12)).name("").build();
         userController.update(updateUser);
-        Set<User> testUsers = new HashSet<>();
+        List<User> testUsers = new ArrayList<>();
         testUsers.add(updateUser);
         assertEquals(userController.findAll(), testUsers);
         assertEquals("testLoginGHANGED",updateUser.getName());

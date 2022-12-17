@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class FilmControllerTest {
     FilmController filmController;
@@ -26,10 +24,10 @@ public class FilmControllerTest {
 
     @Test
     public void testGetFilms() throws ValidationException {
-        Set<Film> testFilms = new HashSet<>();
-        assertEquals(filmController.findAll(), testFilms);
-        testFilms.add(testFilm);
+        List<Film> testFilms = new ArrayList<>();
+        assertEquals(filmController.findAll(), new ArrayList<>());
         filmController.create(testFilm);
+        testFilms.add(testFilm);
         assertEquals(filmController.findAll(), testFilms);
     }
 
@@ -80,7 +78,7 @@ public class FilmControllerTest {
         Film updateFilm = Film.builder().id(testFilm.getId()).name("testNameCHANGED").description("testDescrCHANGED")
                 .releaseDate(LocalDate.of(1990,12,12)).duration(100).build();
         filmController.update(updateFilm);
-        Set<Film> testFilms = new HashSet<>();
+        List<Film> testFilms = new ArrayList<>();
         testFilms.add(updateFilm);
         assertEquals(filmController.findAll(), testFilms);
     }

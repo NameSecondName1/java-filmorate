@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,9 +21,13 @@ public class UserController {
     private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping
-    public User[] findAll() {
+    public List<User> findAll() {
         log.debug("Текущее количество пользователей: {}", users.size());
-        return users.values().toArray(new User[0]);
+        List<User> raspechatka = new ArrayList<>();
+        if (users.size() != 0) {
+            raspechatka.addAll(users.values());
+        }
+        return raspechatka;
     }
 
     @PostMapping
@@ -41,8 +47,13 @@ public class UserController {
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
         if (users.containsKey(user.getId())) {
-            log.info("Юзер с id = {} успешно обновлен.",user.getId());
-            users.put(user.getId(), user);
+            if (isValid(user)) {
+                if ((user.getName() == null)||(user.getName().isBlank())) {
+                    user.setName(user.getLogin());
+                }
+                log.info("Юзер с id = {} успешно обновлен.",user.getId());
+                users.put(user.getId(), user);
+            }
         } else {
             log.debug("Пользователя с id = {} не существует.",user.getId());
             throw new ValidationException("Пользователя с выбранным id не существует.");
