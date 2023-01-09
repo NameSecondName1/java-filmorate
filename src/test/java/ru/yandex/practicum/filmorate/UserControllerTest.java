@@ -19,7 +19,7 @@ public class UserControllerTest {
     User testUser;
     @BeforeEach
     public void beforeEach(){
-        userController = new UserController(null);// ПЕРЕСТАЛО РАБОТАТЬ, ПОТОМ ИСПРАВИТЬ
+        userController = new UserController(null, null);// ПЕРЕСТАЛО РАБОТАТЬ, ПОТОМ ИСПРАВИТЬ
         testUser = User.builder().email("test@mail").login("testLogin")
                 .birthday(LocalDate.of(2000,12,12)).name("testName").build();
     }

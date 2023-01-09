@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage{
@@ -31,7 +30,9 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public boolean isContainId (User user) {
-        return users.containsKey(user.getId());
+    public boolean isContainId(long id) {
+        return users.containsKey(id);
     }
+
+
 }
