@@ -1,36 +1,33 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping({"/users"})
 @Slf4j
 
 public class UserController {
+    InMemoryUserStorage userStorage;
 
-   // private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private long id = 1;
-    private final Map<Long, User> users = new HashMap<>();
+    @Autowired
+    public UserController(InMemoryUserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @GetMapping
     public List<User> findAll() {
-        log.debug("Текущее количество пользователей: {}", users.size());
-        List<User> raspechatka = new ArrayList<>();
-        if (users.size() != 0) {
-            raspechatka.addAll(users.values());
-        }
-        return raspechatka;
+        log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
+        return new ArrayList<>(userStorage.getAllUsers().values());
     }
 
     @PostMapping
@@ -39,32 +36,28 @@ public class UserController {
             if ((user.getName() == null)||(user.getName().isBlank())) {
                 user.setName(user.getLogin());
             }
-            user.setId(id);
-            log.info("Добавлен новый юзер: {}, присвоенный ему id = {}.", user.getName(),user.getId());
-            id++;
-            users.put(user.getId(), user);
         }
-        return user;
+        log.info("Добавлен новый юзер: {}, присвоенный ему id = {}.", user.getName(),user.getId());
+        return userStorage.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
-        if (users.containsKey(user.getId())) {
+        if (userStorage.getAllUsers().containsKey(user.getId())) {
             if (isValid(user)) {
                 if ((user.getName() == null)||(user.getName().isBlank())) {
                     user.setName(user.getLogin());
                 }
-                log.info("Юзер с id = {} успешно обновлен.",user.getId());
-                users.put(user.getId(), user);
             }
+            log.info("Юзер с id = {} успешно обновлен.",user.getId());
+            return userStorage.update(user);
         } else {
             log.debug("Пользователя с id = {} не существует.",user.getId());
             throw new ValidationException("Пользователя с выбранным id не существует.");
         }
-        return user;
     }
 
-    public boolean isValid (User user) {
+    private boolean isValid (User user) {
         if ((user.getEmail() == null)||(user.getEmail().equals(""))) {
             log.debug("У пользователя {} указан пустой e-mail.",user.getName());
             throw new ValidationException("e-mail не должен быть пустым.");
