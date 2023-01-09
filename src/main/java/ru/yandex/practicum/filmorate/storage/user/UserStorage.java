@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserStorage {
-   // List<User> getAllUsers();
-   public Map<Long, User> getAllUsers();
+    Map<Long, User> getAllUsers();
     User create(User user);
     User update(User user);
+    boolean isContainId (User user);
 }

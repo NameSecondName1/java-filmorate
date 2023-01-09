@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,47 +17,44 @@ import java.util.Map;
 
 @RestController
 @RequestMapping({"/films"})
+@Slf4j
 public class FilmController {
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private static long id = 1;
-    private final Map<Long, Film> films = new HashMap<>();
+
+    InMemoryFilmStorage filmStorage;
+
+    @Autowired
+    public FilmController(InMemoryFilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
-    public List<Film> findAll() {
-        log.debug("Текущее количество фильмов: {}", films.size());
-        List<Film> raspechatka = new ArrayList<>();
-        if (films.size() != 0) {
-            raspechatka.addAll(films.values());
-        }
-        return raspechatka;
+    public List<Film> getAllFilms() {
+        log.debug("Текущее количество фильмов: {}", filmStorage.getAllFilms().size());
+        return new ArrayList<>(filmStorage.getAllFilms().values());
     }
 
     @PostMapping
     public Film create(@RequestBody Film film) throws ValidationException {
         if (isValid(film)) {
-            film.setId(id);
             log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
-            id++;
-            films.put(film.getId(), film);
         }
-            return film;
+        return filmStorage.create(film);
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
+        if (filmStorage.isContainId(film)) {
             if (isValid(film)) {
                 log.info("Фильм с id = {} успешно обновлен.",film.getId());
-                films.put(film.getId(), film);
             }
+            return filmStorage.update(film);
         } else {
             log.debug("Фильма с id = {} не существует.",film.getId());
             throw new ValidationException("Фильма с выбранным id не существует.");
         }
-        return film;
     }
 
-    public boolean isValid(Film film) {
+    private boolean isValid(Film film) {
         if ((film.getName() == null)||(film.getName().equals(""))) {
             log.debug("Фильм содержит пустое название.");
             throw new ValidationException("Название не может быть пустым.");

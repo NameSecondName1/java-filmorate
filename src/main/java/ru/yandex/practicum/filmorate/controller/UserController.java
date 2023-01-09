@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -25,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> findAll() {
+    public List<User> getAllUsers() {
         log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
         return new ArrayList<>(userStorage.getAllUsers().values());
     }
@@ -43,7 +42,7 @@ public class UserController {
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
-        if (userStorage.getAllUsers().containsKey(user.getId())) {
+        if (userStorage.isContainId(user)) {
             if (isValid(user)) {
                 if ((user.getName() == null)||(user.getName().isBlank())) {
                     user.setName(user.getLogin());

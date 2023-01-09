@@ -17,7 +17,7 @@ public class FilmControllerTest {
     Film testFilm;
     @BeforeEach
     public void beforeEach() {
-        filmController = new FilmController();
+        filmController = new FilmController(null); // заменить нулл, не работает
         testFilm = Film.builder().name("testName").description("testDescr")
                 .releaseDate(LocalDate.of(2000,12,12)).duration(120).build();
     }

@@ -27,10 +27,10 @@ public class UserControllerTest {
     @Test
     public void testGetUsers() throws ValidationException {
         List<User> testUsers = new ArrayList<>();
-        assertEquals(userController.findAll(), testUsers);
+        assertEquals(userController.getAllUsers(), testUsers);
         testUsers.add(testUser);
         userController.create(testUser);
-        assertEquals(userController.findAll(), testUsers);
+        assertEquals(userController.getAllUsers(), testUsers);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class UserControllerTest {
         userController.update(updateUser);
         List<User> testUsers = new ArrayList<>();
         testUsers.add(updateUser);
-        assertEquals(userController.findAll(), testUsers);
+        assertEquals(userController.getAllUsers(), testUsers);
         assertEquals("testLoginGHANGED",updateUser.getName());
     }
 }
