@@ -33,8 +33,11 @@ public class UserController {
     @GetMapping
     public List<User> getAllUsers() {
         log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
-
-        return new ArrayList<>(userStorage.getAllUsers().values());
+        if (userStorage.getAllUsers().isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(userStorage.getAllUsers().values());
+        }
     }
 
     @PostMapping

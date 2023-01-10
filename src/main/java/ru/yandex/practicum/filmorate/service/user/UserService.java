@@ -23,19 +23,21 @@ public class UserService {
     public void addToFriends(long firstId, long secondId) {
         User firstUser = userStorage.getAllUsers().get(firstId);
         User secondUser = userStorage.getAllUsers().get(secondId);
-        firstUser.getFriends().add(secondId);
-        secondUser.getFriends().add(firstId);
-        userStorage.update(firstUser);
-        userStorage.update(secondUser);
+            firstUser.getFriends().add(secondId);
+            secondUser.getFriends().add(firstId);
+            userStorage.update(firstUser);
+            userStorage.update(secondUser);
+
     }
 
     public void removeFromFriends(long firstId, long secondId) {
         User firstUser = userStorage.getAllUsers().get(firstId);
         User secondUser = userStorage.getAllUsers().get(secondId);
-        firstUser.getFriends().remove(secondId);
-        secondUser.getFriends().remove(firstId);
-        userStorage.update(firstUser);
-        userStorage.update(secondUser);
+            firstUser.getFriends().remove(secondId);
+            secondUser.getFriends().remove(firstId);
+            userStorage.update(firstUser);
+            userStorage.update(secondUser);
+
     }
 
     public List<User> friendsOfBothUsers (long firstId, long secondId) {
@@ -53,7 +55,7 @@ public class UserService {
     }
 
     public boolean isAlreadyFriends (long firstId, long secondId) {
-        return userStorage.getAllUsers().get(firstId).getFriends().contains(secondId);
+            return userStorage.getAllUsers().get(firstId).getFriends().contains(secondId);
     }
 
     public List<User> getUsersByIds(Set<Long> friends) {
