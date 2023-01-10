@@ -1,30 +1,40 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
+import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
+import static ru.yandex.practicum.filmorate.Constants.SORTS;
 
 @RestController
 @RequestMapping({"/films"})
 @Slf4j
-public class FilmController {
 
-    InMemoryFilmStorage filmStorage;
+public class FilmController {
+    FilmStorage filmStorage;
+    FilmService filmService;
+    UserStorage userStorage;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage filmStorage) {
+    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService, InMemoryUserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.filmService = filmService;
+        this.userStorage = userStorage;
     }
 
     @GetMapping
@@ -42,16 +52,66 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film film) throws ValidationException {
-        if (filmStorage.isContainId(film)) {
+    public Film update(@RequestBody Film film) {
+        if (filmStorage.isContainId(film.getId())) {
             if (isValid(film)) {
                 log.info("Фильм с id = {} успешно обновлен.",film.getId());
             }
             return filmStorage.update(film);
         } else {
             log.debug("Фильма с id = {} не существует.",film.getId());
-            throw new ValidationException("Фильма с выбранным id не существует.");
+            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
         }
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById (@PathVariable long id) {
+        if (filmStorage.isContainId(id)) {
+            return filmStorage.getFilmById(id);
+        } else {
+            log.debug("Фильма с id = {} не существует.",id);
+            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+        }
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable long id, @PathVariable long userId) {
+        if (!filmStorage.isContainId(id)) {
+            log.debug("Фильма с id = {} не существует.",id);
+            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+        }
+        if (!userStorage.isContainId(userId)) {
+            log.debug("Пользователя с id = {} не существует.",id);
+            throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+        }
+        return filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
+        if (!filmStorage.isContainId(id)) {
+            log.debug("Фильма с id = {} не существует.",id);
+            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+        }
+        if (!userStorage.isContainId(userId)) {
+            log.debug("Пользователя с id = {} не существует.",id);
+            throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+        }
+        return filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms (
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
+            @RequestParam(value = "sort", defaultValue = DESCENDING_ORDER, required = false) String sort
+    ) {
+        if (!SORTS.contains(sort)) {
+            throw new IncorrectParameterException("sort");
+        }
+        if (count <= 0) {
+            throw new IncorrectParameterException("size");
+        }
+        return filmService.getPopularFilms(count, sort);
     }
 
     private boolean isValid(Film film) {
@@ -71,4 +131,6 @@ public class FilmController {
             return true;
         }
     }
+
+
 }

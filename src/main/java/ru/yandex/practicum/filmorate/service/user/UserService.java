@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 @Service
 public class UserService {
-    InMemoryUserStorage userStorage;
+    UserStorage userStorage;
 
     @Autowired
     public UserService(InMemoryUserStorage userStorage) {
@@ -36,22 +37,6 @@ public class UserService {
         userStorage.update(firstUser);
         userStorage.update(secondUser);
     }
-
-/*    public List<User> friendsOfBothUsers (long firstId, long secondId) {
-        Set<Long> idOfBothUsers = new HashSet<>();
-        User firstUser = userStorage.getAllUsers().get(firstId);
-        User secondUser = userStorage.getAllUsers().get(secondId);
-        if (firstUser.getFriends().isEmpty() || secondUser.getFriends().isEmpty()) {
-            return getUsersByIds(idOfBothUsers);
-        } else {
-            for (Long element: firstUser.getFriends()) {
-                if (secondUser.getFriends().contains(element)) {
-                    idOfBothUsers.add(element);
-                }
-            }
-            return getUsersByIds(idOfBothUsers);
-        }
-    }*/
 
     public List<User> friendsOfBothUsers (long firstId, long secondId) {
         Set<Long> idOfBothUsers = new HashSet<>();

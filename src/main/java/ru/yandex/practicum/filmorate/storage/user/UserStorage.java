@@ -11,4 +11,5 @@ public interface UserStorage {
     User create(User user);
     User update(User user);
     boolean isContainId(long id);
+    User getUserById(long id);
 }

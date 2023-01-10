@@ -34,5 +34,8 @@ public class InMemoryUserStorage implements UserStorage{
         return users.containsKey(id);
     }
 
-
+    @Override
+    public User getUserById(long id) {
+        return users.get(id);
+    }
 }

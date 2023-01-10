@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.List;
 @Slf4j
 
 public class UserController {
-    InMemoryUserStorage userStorage;
+    UserStorage userStorage;
     UserService userService;
 
     @Autowired
@@ -124,6 +125,16 @@ public class UserController {
         log.debug("Запрошен список общих друзей юзеров с id = {} и id = {}.", id, otherId);
         return userService.friendsOfBothUsers(id, otherId);
     }
+
+    @GetMapping("/{id}")
+    public User getUserById (@PathVariable long id) {
+        if (!userStorage.isContainId(id)) {
+            log.debug("Пользователя с id = {} не существует.", id);
+            throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+        }
+        return userStorage.getUserById(id);
+    }
+
 
 
     private boolean isValid (User user) {

@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage{
@@ -34,7 +33,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public boolean isContainId (Film film) {
-        return films.containsKey(film.getId());
+    public boolean isContainId (long id) {
+        return films.containsKey(id);
     }
+
+    @Override
+    public Film getFilmById (long id) {
+        return films.get(id);
+    }
+
+
 }
