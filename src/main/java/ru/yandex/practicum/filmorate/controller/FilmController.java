@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmDoesNotExistException;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
-import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -46,7 +43,7 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) throws ValidationException {
         if (isValid(film)) {
-            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId());
+            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId()+1);
         }
         return filmStorage.create(film);
     }
@@ -75,7 +72,7 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLike(@PathVariable long id, @PathVariable long userId) {
+    public Film addLike(@PathVariable long id, @PathVariable long userId) throws AlreadyLikedException {
         if (!filmStorage.isContainId(id)) {
             log.debug("Фильма с id = {} не существует.",id);
             throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
@@ -83,12 +80,16 @@ public class FilmController {
         if (!userStorage.isContainId(userId)) {
             log.debug("Пользователя с id = {} не существует.",id);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+        }
+        if (filmStorage.getFilmById(id).getLikes().contains(userId)) {
+            log.debug("Пользователя с id = {} уже ставил лайк выбранному фильму.",userId);
+            throw new AlreadyLikedException("Пользователь с выбранным id уже лайкал данный фильм.");
         }
         return filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public Film deleteLike(@PathVariable long id, @PathVariable long userId) throws NoLikeException {
         if (!filmStorage.isContainId(id)) {
             log.debug("Фильма с id = {} не существует.",id);
             throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
@@ -96,6 +97,10 @@ public class FilmController {
         if (!userStorage.isContainId(userId)) {
             log.debug("Пользователя с id = {} не существует.",id);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+        }
+        if (!filmStorage.getFilmById(id).getLikes().contains(userId)) {
+            log.debug("Пользователь с id = {} не ставил лайк выбранному фильму.",id);
+            throw new NoLikeException("Пользователь с выбранным id не ставил лайк выбранному фильму.");
         }
         return filmService.deleteLike(id, userId);
     }
