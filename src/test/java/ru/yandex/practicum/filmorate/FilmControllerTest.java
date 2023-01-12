@@ -22,7 +22,6 @@ public class FilmControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
         InMemoryUserStorage userStorage = new InMemoryUserStorage();
         User testUser1 = User.builder().email("test1@mail").login("test1Login")
                 .birthday(LocalDate.of(1991,12,12)).name("test1Name").build();
@@ -30,7 +29,7 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(1992,12,12)).name("test2Name").build();
         userStorage.create(testUser1);
         userStorage.create(testUser2);
-        filmController = new FilmController(filmStorage, new FilmService(filmStorage), userStorage);
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), userStorage));
         testFilm = Film.builder().name("testName").description("testDescr")
                 .releaseDate(LocalDate.of(2000,12,12)).duration(120).build();
 

@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage{
@@ -41,6 +40,5 @@ public class InMemoryFilmStorage implements FilmStorage{
     public Film getFilmById (long id) {
         return films.get(id);
     }
-
 
 }

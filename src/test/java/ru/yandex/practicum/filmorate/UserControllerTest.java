@@ -24,8 +24,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        InMemoryUserStorage userStorage = new InMemoryUserStorage();
-        userController = new UserController(userStorage, new UserService(userStorage));
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
         testUser1 = User.builder().email("test1@mail").login("test1Login")
                 .birthday(LocalDate.of(1991,12,12)).name("test1Name").build();
         testUser2 = User.builder().email("test2@mail").login("test2Login")
@@ -55,7 +54,6 @@ public class UserControllerTest {
                     }
                 }
         );*/
-
 
         final ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(testUser1));
         assertEquals("e-mail не должен быть пустым.", exception.getMessage());
