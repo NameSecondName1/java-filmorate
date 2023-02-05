@@ -16,4 +16,7 @@ public class Film {
     LocalDate releaseDate;
     int duration;
     final Set<Long> likes = new HashSet<>();
+
+    final Set<String> genres = new HashSet<>();
+    Rating rating;
 }
