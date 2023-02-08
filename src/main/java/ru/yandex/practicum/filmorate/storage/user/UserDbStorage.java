@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -10,10 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component ("userDbStorage")
+@Component("userDbStorage")
 public class UserDbStorage implements UserStorage{
 
-    private long globalId = 1;
+    private long globalId = 3;
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate){

@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
@@ -26,7 +26,7 @@ public class FilmService {
     FilmStorage filmStorage;
     UserStorage userStorage;
     @Autowired
-    public FilmService(@Qualifier("inMemoryFilmStorage") FilmStorage filmStorage, @Qualifier("inMemoryUserStorage") UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -137,4 +137,33 @@ public class FilmService {
         return result;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Map<Integer, String> getGenres() {
+        log.debug("Текущее количество фильмов: {}", filmStorage.getGenres().size());
+        return filmStorage.getGenres();
+    }
+
+    public Optional<String> getGenreById(int id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public Map<Integer, String> getRatings() {
+        return filmStorage.getRatings();
+    }
+
+    public Optional<String> getRatingById(int id) {
+        return filmStorage.getRatingById(id);
+    }
 }

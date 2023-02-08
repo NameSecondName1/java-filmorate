@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Component ("inMemoryFilmStorage")
@@ -41,4 +42,30 @@ public class InMemoryFilmStorage implements FilmStorage{
         return films.get(id);
     }
 
+
+
+
+
+
+
+
+    @Override
+    public Map<Integer, String> getGenres() {
+        return null;
+    }
+
+    @Override
+    public Optional<String> getGenreById(int id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Map<Integer, String> getRatings() {
+        return null;
+    }
+
+    @Override
+    public Optional<String> getRatingById(int id) {
+        return Optional.empty();
+    }
 }

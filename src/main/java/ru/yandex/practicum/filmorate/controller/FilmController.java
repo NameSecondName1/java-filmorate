@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
@@ -61,4 +63,35 @@ public class FilmController {
         return filmService.getPopularFilms(count, sort);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+    @GetMapping("/genres")
+    public Map<Integer, String> getGenres() {
+        return filmService.getGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public Optional<String> getGenreById(@PathVariable int id) {
+        return filmService.getGenreById(id);
+    }
+
+    @GetMapping("/mpa")
+    public Map<Integer, String> getRatings() {
+        return filmService.getRatings();
+    }
+
+    @GetMapping()
+    public Optional<String> getRatingById(@PathVariable int id) {
+        return filmService.getRatingById(id);
+    }
 }
