@@ -30,6 +30,8 @@ public class FilmControllerTest {
         userStorage.create(testUser1);
         userStorage.create(testUser2);
         filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), userStorage));
+        testFilm = new Film(1,"testName", "testDescr", LocalDate.of(2000,12,12),
+                120, 4, Set.of(1,2));
        /* testFilm = Film.builder()
                 .name("testName")
                 .description("testDescr")
@@ -82,10 +84,10 @@ public class FilmControllerTest {
     @Test
     public void testUpdateFilmWithWrongId(){
         filmController.create(testFilm);
-       /* Film wrongIdFilm = Film.builder().id(5000).name("testName").description("testDescr")
-                .releaseDate(LocalDate.of(2000,12,12)).duration(120).build();*/
-       /* final FilmDoesNotExistException exception = assertThrows(FilmDoesNotExistException.class, () -> filmController.update(wrongIdFilm));
-        assertEquals("Фильма с выбранным id не существует.", exception.getMessage());*/
+        Film wrongIdFilm = new Film(5000, "testName", "testDescr", LocalDate.of(2000,12,12),
+                120, 4, Set.of(1,2));
+        final FilmDoesNotExistException exception = assertThrows(FilmDoesNotExistException.class, () -> filmController.update(wrongIdFilm));
+        assertEquals("Фильма с выбранным id не существует.", exception.getMessage());
     }
 
     @Test

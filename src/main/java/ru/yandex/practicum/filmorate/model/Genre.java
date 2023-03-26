@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
 
-
-public class Rating {
+public class Genre {
     private int id;
-    private RatingsMPA name;
+    private String name;
 
-    public Rating(int id, RatingsMPA name) {
+    public Genre(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -20,11 +18,11 @@ public class Rating {
         this.id = id;
     }
 
-    public RatingsMPA getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(RatingsMPA name) {
+    public void setName(String name) {
         this.name = name;
     }
 }

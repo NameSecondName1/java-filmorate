@@ -38,4 +38,36 @@ public class InMemoryUserStorage implements UserStorage{
     public User getUserById(long id) {
         return users.get(id);
     }
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void addToFriends(long fromId, long toId) {
+    }
+    @Override
+    public boolean isAlreadySendInvite(long fromId, long toId) {
+        return true;
+    }
+    @Override
+    public void deleteInviteToFriend(long fromId, long toId){
+    }
+    @Override
+    public Set<Long> getAllFriends(long id) {
+        return null;
+    }
+    @Override
+    public Set<Long> friendsOfBothUsers (long firstId, long secondId) {
+        return null;
+    }
+    @Override
+    public List<User> getUsersByIds(Set<Long> friends) {
+        return null;
+    }
 }

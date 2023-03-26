@@ -25,10 +25,8 @@ public class UserControllerTest {
     @BeforeEach
     public void beforeEach() {
         userController = new UserController(new UserService(new InMemoryUserStorage()));
-        testUser1 = User.builder().email("test1@mail").login("test1Login")
-                .birthday(LocalDate.of(1991,12,12)).name("test1Name").build();
-        testUser2 = User.builder().email("test2@mail").login("test2Login")
-                .birthday(LocalDate.of(1992,12,12)).name("test2Name").build();
+        testUser1 = new User(1, "test1@mail", "test1Login", "test1Name", LocalDate.of(1991,12,12));
+        testUser2 = new User(2, "test2@mail", "test2Login", "test2Name", LocalDate.of(1992,12,12));
     }
 
     @Test
@@ -94,8 +92,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateUserWithWrongId() throws UserDoesNotExistException {
         userController.create(testUser1);
-        User wrongIdUser = User.builder().id(5000).email("test@mail")
-                .login("testLogin").birthday(LocalDate.of(2000,12,12)).name("testName").build();
+        User wrongIdUser = new User(5000, "test@mail", "testLogin", "testName", LocalDate.of(2000,12,12));
         final UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () -> userController.update(wrongIdUser));
         assertEquals("Пользователя с выбранным id не существует.", exception.getMessage());
     }
@@ -103,8 +100,8 @@ public class UserControllerTest {
     @Test
     public void testGoodUpdateUser() throws ValidationException {
         userController.create(testUser1);
-        User updateUser = User.builder().id(testUser1.getId()).email("test@mailCHANGED").login("testLoginGHANGED")
-                .birthday(LocalDate.of(1990,12,12)).name("").build();
+        User updateUser = new User(testUser1.getId(), "test@mailCHANGED", "testLoginGHANGED",
+                "", LocalDate.of(1990,12,12));
         userController.update(updateUser);
         List<User> testUsers = new ArrayList<>();
         testUsers.add(updateUser);
@@ -135,11 +132,11 @@ public class UserControllerTest {
         userController.create(testUser1);
         userController.create(testUser2);
         userController.addToFriends(testUser1.getId(), testUser2.getId());
-        userController.removeFromFriends(testUser1.getId(), testUser2.getId());
+        userController.deleteInviteToFriend(testUser1.getId(), testUser2.getId());
         assertEquals(new HashSet<>(), userController.getUserById(1).getFriends());
 
         final UsersNotFriendsException exception = assertThrows(UsersNotFriendsException.class,
-                () -> userController.removeFromFriends(testUser1.getId(), testUser2.getId()));
+                () -> userController.deleteInviteToFriend(testUser1.getId(), testUser2.getId()));
         assertEquals("Пользователи с выбранными id не являются друзьями.", exception.getMessage());
     }
 
@@ -156,8 +153,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetFriendsOfBothUsers() throws UsersAlreadyFriendsException {
-        User testUser3 = testUser2 = User.builder().email("test3@mail").login("test3Login")
-                .birthday(LocalDate.of(1993,12,12)).name("test3Name").build();
+        User testUser3 = new User(3, "test3@mail", "test3Login", "test3Name", LocalDate.of(1993,12,12));
         userController.create(testUser1);
         userController.create(testUser2);
         userController.create(testUser3);

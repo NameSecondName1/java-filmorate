@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping({"/users"})
@@ -35,23 +36,23 @@ public class UserController {
        return userService.update(user);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
-    public void addToFriends (@PathVariable long id, @PathVariable long friendId) {
-            userService.addToFriends(id, friendId);
+    @PutMapping("/{fromId}/friends/{toId}")
+    public void addToFriends (@PathVariable long fromId, @PathVariable long toId) {
+            userService.addToFriends(fromId, toId);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFromFriends(@PathVariable long id, @PathVariable long friendId) {
-            userService.removeFromFriends(id, friendId);
+    @DeleteMapping("/{fromId}/friends/{toId}")
+    public void deleteInviteToFriend(@PathVariable long fromId, @PathVariable long toId) {
+            userService.deleteInviteToFriend(fromId, toId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getAllFriends (@PathVariable long id) {
+    public Set<Long> getAllFriends (@PathVariable long id) {
         return userService.getAllFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getFriendsOfBothUsers (@PathVariable long id, @PathVariable long otherId) {
+    public Set<Long> getFriendsOfBothUsers (@PathVariable long id, @PathVariable long otherId) {
         return userService.friendsOfBothUsers(id, otherId);
     }
 

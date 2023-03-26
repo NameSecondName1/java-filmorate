@@ -4,9 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
+import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.RatingsMPA;
 
 import java.util.*;
 
@@ -161,57 +164,66 @@ public class FilmDbStorage implements FilmStorage{
         return film;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
-    public Map<Integer, String> getGenres() {
-        Map<Integer, String> genres = new HashMap<>();
+    public List<Genre> getGenres() {
+        List<Genre> genres = new ArrayList<>();
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genre");
         while (filmRows.next()) {
-            genres.put(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
+            Genre genre = new Genre(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
+            genres.add(genre);
         }
         return genres;
     }
 
     @Override
-    public Optional<String> getGenreById(int id) {
+    public Genre getGenreById(int id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genre where genre_id = ?", id);
-        return Optional.of(filmRows.getString("genre_name"));
+        if (filmRows.next()) {
+            return new Genre(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
+        } else {
+            throw new GenreDoesNotExistException("Не существует жанра с указанным id.");
+        }
     }
 
     @Override
-    public Map<Integer, String> getRatings() {
-        Map<Integer, String> ratings = new HashMap<>();
+    public List<Rating> getRatings() {
+        List<Rating> ratings = new ArrayList<>();
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from rating");
-        while (filmRows.next()) {
-            ratings.put(filmRows.getInt("rating_id"), filmRows.getString("rating_name"));
+        while (filmRows.next()){
+            Rating rating = new Rating(filmRows.getInt("rating_id"), filmRows.getObject("rating_name", RatingsMPA.class));
+            ratings.add(rating);
         }
         return ratings;
     }
 
     @Override
-    public Optional<String> getRatingById(int id) {
+    public Rating getRatingById(int id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from rating where rating_id = ?", id);
-        return Optional.of(filmRows.getString("rating_name"));
+        if (filmRows.next()) {
+            return new Rating(filmRows.getInt("rating_id"), filmRows.getObject("rating_name", RatingsMPA.class));
+        } else {
+            throw new RatingDoesNotExistException("Не существует рейтинга с указанным id.");
+        }
     }
+
+    @Override
+    public void addLike(long filmId, long userId) {
+        String sqlQuery = "insert into likes (film_id, user_id)" +
+                "values (?, ?)";
+        jdbcTemplate.update(sqlQuery,
+                filmId,
+                userId
+        );
+    }
+
+    @Override
+    public void deleteLike(long filmId, long userId){
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from likes where film_id = ? and user_id = ?", filmId, userId);
+        String sqlQuery = "delete from likes " +
+                "where likes_id = ?";
+        jdbcTemplate.update(sqlQuery,
+                filmRows.getLong("likes_id")
+        );
+    }
+
 }

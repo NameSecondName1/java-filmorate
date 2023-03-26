@@ -13,14 +13,14 @@ import java.util.Set;
 @Setter
 //@Builder
 public class Film {
-    long id;
-    String name;
-    String description;
-    LocalDate releaseDate;
-    int duration;
-    int ratingId;
-    Set<Long> likes = new HashSet<>();
-    Set<Integer> genresId;
+    private long id;
+    private String name;
+    private String description;
+    private LocalDate releaseDate;
+    private int duration;
+    private int ratingId;
+    private Set<Long> likes = new HashSet<>();
+    private Set<Integer> genresId;
 
  //   Set<String> genres = new HashSet<>();
   //  Rating rating;

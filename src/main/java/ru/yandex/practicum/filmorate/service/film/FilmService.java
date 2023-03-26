@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -64,7 +66,7 @@ public class FilmService {
         }
     }
 
-    public Film addLike(long filmId, long userId) {
+    public void addLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             log.debug("Фильма с id = {} не существует.",filmId);
             throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
@@ -77,11 +79,10 @@ public class FilmService {
             log.debug("Пользователя с id = {} уже ставил лайк выбранному фильму.",userId);
             throw new AlreadyLikedException("Пользователь с выбранным id уже лайкал данный фильм.");
         }
-        filmStorage.getFilmById(filmId).getLikes().add(userId);
-        return filmStorage.getFilmById(filmId);
+        filmStorage.addLike(filmId, userId);
     }
 
-    public Film deleteLike(long filmId, long userId) {
+    public void deleteLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             log.debug("Фильма с id = {} не существует.",filmId);
             throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
@@ -94,8 +95,7 @@ public class FilmService {
             log.debug("Пользователь с id = {} не ставил лайк выбранному фильму.",userId);
             throw new NoLikeException("Пользователь с выбранным id не ставил лайк выбранному фильму.");
         }
-        filmStorage.getFilmById(filmId).getLikes().remove(userId);
-        return filmStorage.getFilmById(userId);
+        filmStorage.deleteLike(filmId, userId);
     }
 
     public List<Film> getPopularFilms(int count, String sort) {
@@ -137,33 +137,23 @@ public class FilmService {
         return result;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public Map<Integer, String> getGenres() {
-        log.debug("Текущее количество фильмов: {}", filmStorage.getGenres().size());
+    public List<Genre> getGenres() {
+        log.debug("Пользователь запросил просмотр списка всех жанров.");
         return filmStorage.getGenres();
     }
 
-    public Optional<String> getGenreById(int id) {
+    public Genre getGenreById(int id) {
+        log.debug("Пользователь запросил название жанра с id = {}", id);
         return filmStorage.getGenreById(id);
     }
 
-    public Map<Integer, String> getRatings() {
+    public List<Rating> getRatings() {
+        log.debug("Пользователь запросил просмотр списка всех рейтингов.");
         return filmStorage.getRatings();
     }
 
-    public Optional<String> getRatingById(int id) {
+    public Rating getRatingById(int id) {
+        log.debug("Пользователь запросил название рейтинга с id = {}", id);
         return filmStorage.getRatingById(id);
     }
 }

@@ -2,8 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,25 +50,33 @@ public class InMemoryFilmStorage implements FilmStorage{
 
 
 
-
-
     @Override
-    public Map<Integer, String> getGenres() {
+    public List<Genre> getGenres() {
         return null;
     }
 
     @Override
-    public Optional<String> getGenreById(int id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Map<Integer, String> getRatings() {
+    public Genre getGenreById(int id) {
         return null;
     }
 
     @Override
-    public Optional<String> getRatingById(int id) {
-        return Optional.empty();
+    public List<Rating> getRatings() {
+        return null;
     }
+
+    @Override
+    public Rating getRatingById(int id) {
+        return null;
+    }
+
+    @Override
+    public void addLike(long filmId, long userId) {
+    }
+
+    @Override
+    public void deleteLike(long filmId, long userId) {
+
+    }
+
 }

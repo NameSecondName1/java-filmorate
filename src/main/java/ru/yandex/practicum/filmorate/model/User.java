@@ -9,15 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 
-@Builder
+
 public class User {
-    long id;
-    String email;
-    String login;
-    String name;
-    LocalDate birthday;
-    final Set<Long> friends = new HashSet<>();
-    final Map<Long, Friendship> friendshipStatuses = new HashMap<>();
+    private long id;
+    private String email;
+    private String login;
+    private String name;
+    private LocalDate birthday;
+    private Map<Long, Friendship> friendshipStatuses = new HashMap<>();
 
     public User(long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -68,11 +67,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public Set<Long> getFriends() {
-        return friends;
-    }
-
     public Map<Long, Friendship> getFriendshipStatuses() {
         return friendshipStatuses;
+    }
+
+    public void setFriendshipStatuses(Map<Long, Friendship> friendshipStatuses) {
+        this.friendshipStatuses = friendshipStatuses;
     }
 }
