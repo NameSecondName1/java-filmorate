@@ -14,7 +14,7 @@ import java.util.*;
 @Component("userDbStorage")
 public class UserDbStorage implements UserStorage{
 
-    private long globalId = 4;
+    private long globalId = 1;
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate){
@@ -32,8 +32,7 @@ public class UserDbStorage implements UserStorage{
                     userRows.getString("email"),
                     userRows.getString("login"),
                     userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate()
-            );
+                    userRows.getDate("birthday").toLocalDate());
             result.put(user.getId(), user);
         }
         while (friendshipRows.next()) {
@@ -64,7 +63,7 @@ public class UserDbStorage implements UserStorage{
     }
 
     @Override
-    public User update(User user) {         // CHANGED
+    public User update(User user) {
         String sqlQuery = "update USERS set " +
                 "name = ?, login = ?, email = ?, birthday = ? " +
                 "where id = ?";

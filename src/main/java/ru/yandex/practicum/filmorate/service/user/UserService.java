@@ -39,6 +39,11 @@ public class UserService {
         }
         log.info("Добавлен новый юзер: {}.", user.getName());
         return userStorage.create(user);
+       /* if (userStorage.isContainId(user.getId())) {
+            throw new
+        } else {
+
+        }*/
     }
 
     public User update(User user) {
