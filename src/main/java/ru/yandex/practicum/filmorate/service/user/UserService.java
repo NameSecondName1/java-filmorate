@@ -27,7 +27,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers(){
-        log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
+        // log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
         return new ArrayList<>(userStorage.getAllUsers().values());
     }
 
@@ -75,7 +75,7 @@ public class UserService {
         }
         if (isAlreadySendInvite(fromId, toId)) {
             log.debug("Пользователь с id = {} уже отправлял запрос на дружбу юзеру с id = {}.", fromId, toId);
-            throw new UsersAlreadyFriendsException("Пользователи с выбранными id уже друзья.");
+            throw new UsersAlreadyFriendsException("Пользователь уже отправлял запрос на добавление в друзья.");
         } else {
             log.debug("Пользователь с id = {} отправил запрос на дружбу юзеру с id = {}.", fromId, toId);
             userStorage.addToFriends(fromId, toId);
@@ -96,7 +96,7 @@ public class UserService {
             userStorage.deleteInviteToFriend(firstId, secondId);
         } else {
             log.debug("Пользователь с id = {} не отправлял запрос на дружбу юзеру с id = {}.", firstId, secondId);
-            throw new UsersNotFriendsException("Пользователи с выбранными id не являются друзьями.");
+            throw new UsersNotFriendsException("Выбранный пользователь не отправлял запрос на дружбу.");
         }
     }
 

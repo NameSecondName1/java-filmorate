@@ -33,10 +33,10 @@ public class FilmDbStorage implements FilmStorage{
         Film film = new Film(0,null,null,null,0,0,null);
         long firstId = 1;
 
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film AS f" +
-                "left outer join film_genres AS fg ON f.id = fg.film_id" +
-                "left outer join likes AS l ON f.id = l.film_id" +
-                "order by id asc");
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film AS f " +
+                "left outer join film_genres AS fg ON f.id = fg.film_id " +
+                "left outer join likes AS l ON f.id = l.film_id " +
+                "order by id asc;");
 
         while (filmRows.next()) {
             if (filmRows.getLong("id") != firstId) {
