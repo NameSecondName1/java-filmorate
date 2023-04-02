@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserDoesNotExistException;
-import ru.yandex.practicum.filmorate.exception.UsersAlreadyFriendsException;
-import ru.yandex.practicum.filmorate.exception.UsersNotFriendsException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -27,7 +24,6 @@ public class UserService {
     }
 
     public List<User> getAllUsers(){
-        // log.debug("Текущее количество пользователей: {}", userStorage.getAllUsers().size());
         return new ArrayList<>(userStorage.getAllUsers().values());
     }
 
@@ -37,13 +33,14 @@ public class UserService {
                 user.setName(user.getLogin());
             }
         }
+     /*   if (userStorage.isContainId(user.getId())) {
+            throw new UserAlreadyExistException("Пользователь с выбранным ID уже существует.");
+        } else {
+            log.info("Добавлен новый юзер: {}.", user.getName());
+            return userStorage.create(user);
+        }*/
         log.info("Добавлен новый юзер: {}.", user.getName());
         return userStorage.create(user);
-       /* if (userStorage.isContainId(user.getId())) {
-            throw new
-        } else {
-
-        }*/
     }
 
     public User update(User user) {

@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-
-
 public class Rating {
     private int id;
     private RatingsMPA name;
