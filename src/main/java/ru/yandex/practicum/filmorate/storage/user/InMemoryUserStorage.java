@@ -39,35 +39,26 @@ public class InMemoryUserStorage implements UserStorage{
         return users.get(id);
     }
 
-
-
-
-
-
-
-
-
-
     @Override
     public void addToFriends(long fromId, long toId) {
     }
     @Override
-    public boolean isAlreadySendInvite(long fromId, long toId) {
+    public boolean isAlreadyFriend(long fromId, long toId) {
         return true;
     }
     @Override
-    public void deleteInviteToFriend(long fromId, long toId){
+    public void deleteFromFriend(long fromId, long toId){
     }
     @Override
-    public Set<Long> getAllFriends(long id) {
+    public List<User> getAllFriends(long id) {
         return null;
     }
     @Override
-    public Set<Long> friendsOfBothUsers (long firstId, long secondId) {
+    public List<User> friendsOfBothUsers (long firstId, long secondId) {
         return null;
     }
     @Override
-    public List<User> getUsersByIds(Set<Long> friends) {
+    public List<User> getUsersByIds(List<Long> friends) {
         return null;
     }
 }

@@ -36,23 +36,23 @@ public class UserController {
        return userService.update(user);
     }
 
-    @PutMapping("/{fromId}/friends/{toId}")
-    public void addToFriends (@PathVariable long fromId, @PathVariable long toId) {
-            userService.addToFriends(fromId, toId);
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addToFriends (@PathVariable long userId, @PathVariable long friendId) {
+            userService.addToFriends(userId, friendId);
     }
 
-    @DeleteMapping("/{fromId}/friends/{toId}")
-    public void deleteInviteToFriend(@PathVariable long fromId, @PathVariable long toId) {
-            userService.deleteInviteToFriend(fromId, toId);
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void deleteInviteToFriend(@PathVariable long userId, @PathVariable long friendId) {
+            userService.deleteInviteToFriend(userId, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<Long> getAllFriends (@PathVariable long id) {
+    public List<User> getAllFriends (@PathVariable long id) {
         return userService.getAllFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<Long> getFriendsOfBothUsers (@PathVariable long id, @PathVariable long otherId) {
+    public List<User> getFriendsOfBothUsers (@PathVariable long id, @PathVariable long otherId) {
         return userService.friendsOfBothUsers(id, otherId);
     }
 

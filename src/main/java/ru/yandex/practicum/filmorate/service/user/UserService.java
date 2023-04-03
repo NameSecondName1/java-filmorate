@@ -10,9 +10,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -33,12 +31,6 @@ public class UserService {
                 user.setName(user.getLogin());
             }
         }
-     /*   if (userStorage.isContainId(user.getId())) {
-            throw new UserAlreadyExistException("Пользователь с выбранным ID уже существует.");
-        } else {
-            log.info("Добавлен новый юзер: {}.", user.getName());
-            return userStorage.create(user);
-        }*/
         log.info("Добавлен новый юзер: {}.", user.getName());
         return userStorage.create(user);
     }
@@ -66,43 +58,43 @@ public class UserService {
         return userStorage.getUserById(id);
     }
 
-    public void addToFriends(long fromId, long toId) {
-        if (!userStorage.isContainId(fromId)) {
-            log.debug("Пользователя с id = {} не существует.", fromId);
+    public void addToFriends(long userId, long friendId) {
+        if (!userStorage.isContainId(userId)) {
+            log.debug("Пользователя с id = {} не существует.", userId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
         }
-        if (!userStorage.isContainId(toId)) {
-            log.debug("Пользователя с id = {} не существует.", toId);
+        if (!userStorage.isContainId(friendId)) {
+            log.debug("Пользователя с id = {} не существует.", friendId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
         }
-        if (isAlreadySendInvite(fromId, toId)) {
-            log.debug("Пользователь с id = {} уже отправлял запрос на дружбу юзеру с id = {}.", fromId, toId);
-            throw new UsersAlreadyFriendsException("Пользователь уже отправлял запрос на добавление в друзья.");
+        if (isAlreadyFriend(userId, friendId)) {
+            log.debug("Пользователь с id = {} уже в списке друзей у юзера с id = {}.", friendId, userId);
+            throw new UsersAlreadyFriendsException("Пользователь уже в списке друзей.");
         } else {
-            log.debug("Пользователь с id = {} отправил запрос на дружбу юзеру с id = {}.", fromId, toId);
-            userStorage.addToFriends(fromId, toId);
+            log.debug("Пользователь с id = {} добавлен в список друзей к юзеру с id = {}.", friendId, userId);
+            userStorage.addToFriends(userId, friendId);
         }
     }
 
-    public void deleteInviteToFriend(long firstId, long secondId) {
-        if (!userStorage.isContainId(firstId)) {
-            log.debug("Пользователя с id = {} не существует.", firstId);
+    public void deleteInviteToFriend(long userId, long friendId) {
+        if (!userStorage.isContainId(userId)) {
+            log.debug("Пользователя с id = {} не существует.", userId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
         }
-        if (!userStorage.isContainId(secondId)) {
-            log.debug("Пользователя с id = {} не существует.", secondId);
+        if (!userStorage.isContainId(friendId)) {
+            log.debug("Пользователя с id = {} не существует.", friendId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
         }
-        if (isAlreadySendInvite(firstId, secondId)) {
-            log.debug("Запрос на дружбу от юзера с id = {} юзеру с id = {} отменен.", firstId, secondId);
-            userStorage.deleteInviteToFriend(firstId, secondId);
+        if (isAlreadyFriend(userId, friendId)) {
+            log.debug("У юзера с id = {} удален из списка друзей юзер с id = {}.", userId, friendId);
+            userStorage.deleteFromFriend(userId, friendId);
         } else {
-            log.debug("Пользователь с id = {} не отправлял запрос на дружбу юзеру с id = {}.", firstId, secondId);
-            throw new UsersNotFriendsException("Выбранный пользователь не отправлял запрос на дружбу.");
+            log.debug("У пользователя с id = {} нет друга с id = {}.", userId, friendId);
+            throw new UsersNotFriendsException("Выбранный пользователь не в списке друзей.");
         }
     }
 
-    public Set<Long> getAllFriends(long id) {
+    public List<User> getAllFriends(long id) {
         if (!userStorage.isContainId(id)) {
             log.debug("Пользователя с id = {} не существует.", id);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
@@ -111,7 +103,7 @@ public class UserService {
         return userStorage.getAllFriends(id);
     }
 
-    public Set<Long> friendsOfBothUsers (long firstId, long secondId) {
+    public List<User> friendsOfBothUsers (long firstId, long secondId) {
         if (!userStorage.isContainId(firstId)) {
             log.debug("Пользователя с id = {} не существует.", firstId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
@@ -120,29 +112,15 @@ public class UserService {
             log.debug("Пользователя с id = {} не существует.", secondId);
             throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
         }
-     /*   Set<Long> idOfBothUsers = new HashSet<>();
-        User firstUser = userStorage.getAllUsers().get(firstId);
-        User secondUser = userStorage.getAllUsers().get(secondId);
-        if (!firstUser.getFriends().isEmpty() && !secondUser.getFriends().isEmpty()) {
-            for (Long element : firstUser.getFriends()) {
-                if (secondUser.getFriends().contains(element)) {
-                    idOfBothUsers.add(element);
-                }
-            }
-        }*/
         log.debug("Запрошен список id общих друзей юзеров с id = {} и id = {}.", firstId, secondId);
         return userStorage.friendsOfBothUsers(firstId, secondId);
     }
 
-    public boolean isAlreadySendInvite(long fromId, long toId)
+    public boolean isAlreadyFriend(long userId, long friendId)
     {
-            return userStorage.isAlreadySendInvite(fromId, toId);
+            return userStorage.isAlreadyFriend(userId, friendId);
     }
 
-    public List<User> getUsersByIds(Set<Long> friends) {
-        log.debug("Запрошен список юзеров по переданному множеству id.");
-        return userStorage.getUsersByIds(friends);
-    }
 
     private boolean isValid (User user) {
         if ((user.getEmail() == null)||(user.getEmail().equals(""))) {

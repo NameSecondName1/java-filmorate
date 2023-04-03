@@ -35,15 +35,21 @@ public class UserDbStorage implements UserStorage{
                     userRows.getDate("birthday").toLocalDate());
             result.put(user.getId(), user);
         }
+
+
+
         while (friendshipRows.next()) {
             if (friendshipRows.getString("friendship_status").equals("CONFIRMED")) {
-                result.get(friendshipRows.getLong("to_id")).getFriendshipStatuses().
-                        put(friendshipRows.getLong("from_id"), Friendship.CONFIRMED);
+                result.get(friendshipRows.getLong("user_id")).getFriendshipStatuses().
+                        put(friendshipRows.getLong("friend_id"), Friendship.CONFIRMED);
             } else {
-                result.get(friendshipRows.getLong("to_id")).getFriendshipStatuses().
-                        put(friendshipRows.getLong("from_id"), Friendship.UNCONFIRMED);
+                result.get(friendshipRows.getLong("user_id")).getFriendshipStatuses().
+                        put(friendshipRows.getLong("friend_id"), Friendship.UNCONFIRMED);
             }
         }
+
+
+
         return result;
     }
 
@@ -91,52 +97,55 @@ public class UserDbStorage implements UserStorage{
                 userRows.getString("login"),
                 userRows.getString("name"),
                 userRows.getDate("birthday").toLocalDate());
-        SqlRowSet friendshipRows = jdbcTemplate.queryForRowSet("select * from FRIENDSHIPS where to_id = ?", id);
+        SqlRowSet friendshipRows = jdbcTemplate.queryForRowSet("select * from FRIENDSHIPS where user_id = ?", id);
         while (friendshipRows.next()) {
             if (friendshipRows.getString("friendship_status").equals("CONFIRMED")) {
-                user.getFriendshipStatuses().put(friendshipRows.getLong("from_id"), Friendship.CONFIRMED);
+                user.getFriendshipStatuses().put(friendshipRows.getLong("friend_id"), Friendship.CONFIRMED);
             } else {
-                user.getFriendshipStatuses().put(friendshipRows.getLong("from_id"), Friendship.UNCONFIRMED);
+                user.getFriendshipStatuses().put(friendshipRows.getLong("friend_id"), Friendship.UNCONFIRMED);
             }
         }
         return user;
     }
 
     @Override
-    public void addToFriends(long fromId, long toId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where from_id = ? and to_id = ?", toId, fromId);
+    public void addToFriends(long userId, long friendId) {
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
         if (userRows.next()) {
-            String sqlQuery = "insert into friendships (from_id, to_id, friendship_status)" +
-                    "values (?, ?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    fromId,
-                    toId,
-                    "CONFIRMED");
-            sqlQuery = "update friendships set " +
+
+            String sqlQuery = "update friendships set " +
                     "friendship_status = ?" +
                     "where friendship_id = ?";
             jdbcTemplate.update(sqlQuery,
                     "CONFIRMED",
                     userRows.getLong("friendship_id"));
-        } else {
-            String sqlQuery = "insert into friendships (from_id, to_id, friendship_status)" +
+
+            sqlQuery = "insert into friendships (user_id, friend_id, friendship_status)" +
                     "values (?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
-                    fromId,
-                    toId,
+                    userId,
+                    friendId,
+                    "CONFIRMED");
+
+        } else {
+            String sqlQuery = "insert into friendships (user_id, friend_id, friendship_status)" +
+                    "values (?, ?, ?)";
+            jdbcTemplate.update(sqlQuery,
+                    userId,
+                    friendId,
                     "UNCONFIRMED");
         }
     }
 
     @Override
-    public boolean isAlreadySendInvite(long fromId, long toId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where from_id = ? and to_id = ?", fromId, toId);
+    public boolean isAlreadyFriend(long userId, long friendId) {
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", userId, friendId);
         return userRows.next();
     }
 
     @Override
-    public void deleteInviteToFriend(long fromId, long toId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where from_id = ? and to_id = ?", toId, fromId);
+    public void deleteFromFriend(long userId, long friendId) {
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
         if (userRows.next()) {
             String sqlQuery = "update friendships set " +
                     "friendship_status = ?" +
@@ -146,39 +155,47 @@ public class UserDbStorage implements UserStorage{
                     userRows.getLong("friendship_id"));
         }
         String sqlQuery = "delete from friendships " +
-                "where from_id = ? and to_id = ?";
+                "where user_id = ? and friend_id = ?";
 
-
-        // на ноуте запрос удаления по ПК, а не по двум полям, при траблах проверить это место
-
-
-        jdbcTemplate.update(sqlQuery, fromId, toId);
+        jdbcTemplate.update(sqlQuery, userId, friendId);
     }
 
     @Override
-    public Set<Long> getAllFriends(long id) {
-        Set<Long> friendsId = new HashSet<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where to_id = ?", id);
+    public List<User> getAllFriends(long id) {
+        List<Long> friendsId = new ArrayList<>();
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ?", id);
         while (userRows.next()) {
-            long x = userRows.getLong("from_id");
+            long x = userRows.getLong("friend_id");
             friendsId.add(x);
         }
-        return friendsId;
+        return getUsersByIds(friendsId);
     }
     @Override
-    public Set<Long> friendsOfBothUsers (long firstId, long secondId) {
-        Set<Long> friendsOfBoth = new HashSet<>();
-        Set<Long> firstFriendsId = getAllFriends(firstId);
-        Set<Long> secondFriendsId = getAllFriends(secondId);
-        for (Long element : firstFriendsId) {
-            if (secondFriendsId.contains(element)) {
+    public List<User> friendsOfBothUsers (long firstId, long secondId) {
+        List<User> friendsOfBoth = new ArrayList<>();
+  /*      List<User> firstFriends = getAllFriends(firstId);
+        List<User> secondFriends = getAllFriends(secondId);
+        for (User element : firstFriends) {
+            if (secondFriends.contains(element)) {
                 friendsOfBoth.add(element);
             }
+        }*/
+        Map<Long, User> allUsers = getAllUsers();
+        Map<Long, Friendship> firstUserFriends = allUsers.get(firstId).getFriendshipStatuses();
+        Map<Long, Friendship> secondUserFriends = allUsers.get(secondId).getFriendshipStatuses();
+        List<Long> idOfBothFriends = new ArrayList<>();
+        for (Long element : firstUserFriends.keySet()) {
+            if (secondUserFriends.containsKey(element)) {
+                idOfBothFriends.add(element);
+            }
+        }
+        for (Long element : idOfBothFriends) {
+            friendsOfBoth.add(allUsers.get(element));
         }
         return friendsOfBoth;
     }
     @Override
-    public List<User> getUsersByIds(Set<Long> friends) {
+    public List<User> getUsersByIds(List<Long> friends) {
         List<User> users = new ArrayList<>();
         Map<Long, User> allUsers = getAllUsers();
         for (Long element : friends) {
