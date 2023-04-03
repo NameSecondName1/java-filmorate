@@ -9,6 +9,9 @@ public class Genre {
         this.id = id;
         this.name = name;
     }
+    public Genre(int id) {
+        this.id = id;
+    }
 
     public int getId() {
         return id;
@@ -25,4 +28,5 @@ public class Genre {
     public void setName(String name) {
         this.name = name;
     }
+
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @RestController
-@RequestMapping({"/films"})
+//@RequestMapping({"/films"})
 @Slf4j
 
 public class FilmController {
@@ -26,37 +26,37 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @GetMapping
+    @GetMapping({"/films"})
     public List<Film> getAllFilms() {
         return filmService.getAllFilms();
     }
 
-    @PostMapping
+    @PostMapping({"/films"})
     public Film create(@RequestBody Film film){
         return filmService.create(film);
     }
 
-    @PutMapping
+    @PutMapping({"/films"})
     public Film update(@RequestBody Film film) {
         return filmService.update(film);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/films/{id}")
     public Film getFilmById (@PathVariable long id) {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     public void addLike(@PathVariable long id, @PathVariable long userId){
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     public void deleteLike(@PathVariable long id, @PathVariable long userId){
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     public List<Film> getPopularFilms (
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
             @RequestParam(value = "sort", defaultValue = DESCENDING_ORDER, required = false) String sort

@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 public class Rating {
     private int id;
-    private RatingsMPA name;
+   // private RatingsMPA name;
+   private String name;
 
-    public Rating(int id, RatingsMPA name) {
+    public Rating(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+    public Rating(int id) {
+        this.id = id;
     }
 
     public int getId() {
@@ -17,11 +21,12 @@ public class Rating {
         this.id = id;
     }
 
-    public RatingsMPA getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(RatingsMPA name) {
+    public void setName(String name) {
         this.name = name;
     }
+
 }
