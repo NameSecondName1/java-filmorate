@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -15,10 +16,12 @@ import java.util.List;
 @Slf4j
 public class UserService {
     UserStorage userStorage;
+    FriendsStorage friendsStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     public List<User> getAllUsers() {
@@ -71,7 +74,7 @@ public class UserService {
             throw new UsersAlreadyFriendsException("Пользователь уже в списке друзей.");
         } else {
             log.debug("Пользователь с id = {} добавлен в список друзей к юзеру с id = {}.", friendId, userId);
-            userStorage.addToFriends(userId, friendId);
+            friendsStorage.addToFriends(userId, friendId);
         }
     }
 
@@ -86,7 +89,7 @@ public class UserService {
         }
         if (isAlreadyFriend(userId, friendId)) {
             log.debug("У юзера с id = {} удален из списка друзей юзер с id = {}.", userId, friendId);
-            userStorage.deleteFromFriend(userId, friendId);
+            friendsStorage.deleteFromFriend(userId, friendId);
         } else {
             //  log.debug("У пользователя с id = {} нет друга с id = {}.", userId, friendId);
             throw new UsersNotFriendsException("Выбранный пользователь не в списке друзей.");
@@ -99,7 +102,7 @@ public class UserService {
             throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
         log.debug("Запрошен список id друзей юзера с id = {} .", id);
-        return userStorage.getAllFriends(id);
+        return friendsStorage.getAllFriends(id);
     }
 
     public List<User> friendsOfBothUsers(long firstId, long secondId) {
@@ -112,11 +115,11 @@ public class UserService {
             throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
         log.debug("Запрошен список id общих друзей юзеров с id = {} и id = {}.", firstId, secondId);
-        return userStorage.friendsOfBothUsers(firstId, secondId);
+        return friendsStorage.friendsOfBothUsers(firstId, secondId);
     }
 
     public boolean isAlreadyFriend(long userId, long friendId) {
-        return userStorage.isAlreadyFriend(userId, friendId);
+        return friendsStorage.isAlreadyFriend(userId, friendId);
     }
 
 

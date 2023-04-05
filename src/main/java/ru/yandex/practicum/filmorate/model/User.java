@@ -16,7 +16,7 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Map<Long, Friendship> friendshipStatuses = new HashMap<>();
+  //  private Map<Long, Friendship> friendshipStatuses = new HashMap<>();
 
     public User(long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -67,11 +67,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public Map<Long, Friendship> getFriendshipStatuses() {
+/*    public Map<Long, Friendship> getFriendshipStatuses() {
         return friendshipStatuses;
     }
 
     public void setFriendshipStatuses(Map<Long, Friendship> friendshipStatuses) {
         this.friendshipStatuses = friendshipStatuses;
-    }
+    }*/
 }

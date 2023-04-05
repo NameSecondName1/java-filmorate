@@ -57,8 +57,8 @@ MERGE INTO genres
 
 
 
-/*
-MERGE INTO users
+
+/*MERGE INTO users
     USING (VALUES (1, 'UserName1', 'Login1', 'email1@email.com', '1990-05-05')) s(ID, NAME , LOGIN, EMAIL, BIRTHDAY)
     ON users.ID = s.ID
     WHEN NOT MATCHED THEN INSERT VALUES (1, 'UserName1', 'Login1', 'email1@email.com', '1990-05-05');

@@ -11,12 +11,5 @@ public interface UserStorage {
     User update(User user);
     boolean isContainId(long id);
     User getUserById(long id);
-
-
-    void addToFriends(long fromId, long toId);
-    boolean isAlreadyFriend(long fromId, long toId);
-    void deleteFromFriend(long fromId, long toId);
-    List<User> getAllFriends(long id);
-    List<User> friendsOfBothUsers (long firstId, long secondId);
     List<User> getUsersByIds(List<Long> friends);
 }
