@@ -41,7 +41,7 @@ public class FilmDbStorage implements FilmStorage{
                     filmRows.getInt("duration"),
                     new Rating(filmRows.getInt("rating_id"),
                             filmRows.getString("rating_name")),
-                    new ArrayList<>());
+                    new LinkedHashSet<>());
             films.put(film.getId(), film);
         }
         while (likesRows.next()) {
@@ -76,7 +76,7 @@ public class FilmDbStorage implements FilmStorage{
         return film;
     }
 
-    private void insertGenres(List<Genre> genresId, long id) {
+    private void insertGenres(Set<Genre> genresId, long id) {
         for (Genre element : genresId) {
             String sqlQuery = "insert into film_genres(film_id, genre_id)" +
                     "values (?, ?)";
@@ -101,26 +101,21 @@ public class FilmDbStorage implements FilmStorage{
                 film.getId()
                 );
         if (film.getGenres() != null){
-
-        Map<Integer, Genre> uniqGenres = new HashMap<>();
-        for (Genre element : film.getGenres()) {
-            if (!uniqGenres.containsKey(element.getId())) {
-                uniqGenres.put(element.getId(), element);
+            Map<Integer, Genre> uniqGenres = new HashMap<>();
+            for (Genre element : film.getGenres()) {
+                if (!uniqGenres.containsKey(element.getId())) {
+                    uniqGenres.put(element.getId(), element);
+                }
             }
-        }
-        List<Genre> uniqSortedList = new ArrayList<>(uniqGenres.values());
-        GenreComparator genreComparator = new GenreComparator();
-        uniqSortedList.sort(genreComparator);
-
-         film.setGenres(uniqSortedList);
-         updateGenres(film.getGenres(), film.getId());
-
+            Set<Genre> uniqSet = new LinkedHashSet<>(uniqGenres.values());
+            film.setGenres(uniqSet);
+            updateGenres(film.getGenres(), film.getId());
         }
         return film;
     }
 
-    private void updateGenres(List<Genre> genresId, long id) {
-        List<Genre> genresFromDb = new ArrayList<>();
+    private void updateGenres(Set<Genre> genresId, long id) {
+        Set<Genre> genresFromDb = new LinkedHashSet<>();
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film_genres where film_id = ?", id);
         while (filmRows.next()) {
             int x = filmRows.getInt("genre_id");
@@ -158,7 +153,7 @@ public class FilmDbStorage implements FilmStorage{
                 filmRows.getInt("duration"),
                 new Rating(filmRows.getInt("rating_id"),
                         filmRows.getString("rating_name")),
-                new ArrayList<>());
+                new LinkedHashSet<>());
 
         SqlRowSet likesRows = jdbcTemplate.queryForRowSet("select * from likes where film_id = ?", id);
         while (likesRows.next()) {

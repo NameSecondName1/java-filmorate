@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-id long  PRIMARY KEY,
+id long PRIMARY KEY,
 name varchar (100),
 login varchar (100),
 email varchar (200),
