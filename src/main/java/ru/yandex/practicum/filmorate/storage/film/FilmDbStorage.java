@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.EntityNotFountException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.storage.Genre.GenresStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -19,9 +20,11 @@ import java.util.*;
 @Component
 public class FilmDbStorage implements FilmStorage{
     private final JdbcTemplate jdbcTemplate;
+    private final GenresStorage genresStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate){
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenresStorage genresStorage){
         this.jdbcTemplate=jdbcTemplate;
+        this.genresStorage = genresStorage;
     }
 
     @Override
@@ -30,7 +33,6 @@ public class FilmDbStorage implements FilmStorage{
 
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films AS F " +
                 "left outer join ratings AS R ON F.rating_id = R.rating_id");
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("select * from likes");
         SqlRowSet genresRows = jdbcTemplate.queryForRowSet("select * from film_genres AS FG " +
                 "left outer join genres AS G ON FG.genre_id = G.genre_id");
 
@@ -45,10 +47,6 @@ public class FilmDbStorage implements FilmStorage{
                             filmRows.getString("rating_name")),
                     new LinkedHashSet<>());
             films.put(film.getId(), film);
-        }
-        while (likesRows.next()) {
-            films.get(likesRows.getLong("film_id")).getLikes().
-                    add(likesRows.getLong("user_id"));
         }
         while (genresRows.next()) {
             films.get(genresRows.getLong("film_id")).getGenres().
@@ -74,22 +72,12 @@ public class FilmDbStorage implements FilmStorage{
         long generatedId = keyHolder.getKey().longValue();
 
         if (film.getGenres() != null) {
-            insertGenres(film.getGenres(), generatedId);
+            genresStorage.insertGenres(film.getGenres(), generatedId);
         }
         film.setId(generatedId);
         return film;
     }
 
-    private void insertGenres(Set<Genre> genresId, long id) {
-        for (Genre element : genresId) {
-            String sqlQuery = "insert into film_genres(film_id, genre_id)" +
-                    "values (?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    id,
-                    element.getId()
-            );
-        }
-    }
 
     @Override
     public Film update(Film film) {
@@ -113,29 +101,11 @@ public class FilmDbStorage implements FilmStorage{
             }
             Set<Genre> uniqSet = new LinkedHashSet<>(uniqGenres.values());
             film.setGenres(uniqSet);
-            updateGenres(film.getGenres(), film.getId());
+            genresStorage.updateGenres(film.getGenres(), film.getId());
         }
         return film;
     }
 
-    private void updateGenres(Set<Genre> genresId, long id) {
-        Set<Genre> genresFromDb = new LinkedHashSet<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film_genres where film_id = ?", id);
-        while (filmRows.next()) {
-            int x = filmRows.getInt("genre_id");
-            if (genresId.contains(new Genre(x))) {
-                genresFromDb.add(new Genre(x));
-            } else {
-                String sqlQuery = "delete from film_genres " +
-                        "where film_genres_id = ?";
-                jdbcTemplate.update(sqlQuery,
-                        filmRows.getInt("film_genres_id")
-                );
-            }
-        }
-        genresId.removeAll(genresFromDb);
-        insertGenres(genresId, id);
-    }
 
     @Override
     public boolean isContainId(long id) {
@@ -159,11 +129,6 @@ public class FilmDbStorage implements FilmStorage{
                         filmRows.getString("rating_name")),
                 new LinkedHashSet<>());
 
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("select * from likes where film_id = ?", id);
-        while (likesRows.next()) {
-            film.getLikes().add(likesRows.getLong("user_id"));
-        }
-
         SqlRowSet genresRows = jdbcTemplate.queryForRowSet("select * from film_genres AS FG " +
                 "left outer join genres AS G ON FG.genre_id = G.genre_id " +
                 "where film_id = ?", id);
@@ -172,28 +137,6 @@ public class FilmDbStorage implements FilmStorage{
                     genresRows.getString("genre_name")));
         }
         return film;
-    }
-
-    @Override
-    public List<Genre> getGenres() {
-        List<Genre> genres = new ArrayList<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genres ORDER BY genre_id ASC");
-        while (filmRows.next()) {
-            Genre genre = new Genre(filmRows.getInt("genre_id"),
-                    filmRows.getString("genre_name"));
-            genres.add(genre);
-        }
-        return genres;
-    }
-
-    @Override
-    public Genre getGenreById(int id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genres where genre_id = ?", id);
-        if (filmRows.next()) {
-            return new Genre(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
-        } else {
-            throw new EntityNotFountException("Не существует жанра с указанным id.");
-        }
     }
 
     @Override
@@ -220,43 +163,5 @@ public class FilmDbStorage implements FilmStorage{
             throw new EntityNotFountException("Не существует рейтинга с указанным id.");
         }
     }
-
-    @Override
-    public void addLike(long filmId, long userId) {
-        String sqlQuery = "insert into likes (film_id, user_id)" +
-                "values (?, ?)";
-        jdbcTemplate.update(sqlQuery,
-                filmId,
-                userId
-        );
-    }
-
-    @Override
-    public void deleteLike(long filmId, long userId){
-        String sqlQuery = "delete from likes where film_id = ? and user_id = ?";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-    }
-
-/*    private RatingsMPA ratingMPAFromString (String ratingName) {
-        RatingsMPA name = null;
-        switch (ratingName) {
-            case "G":
-                name =  RatingsMPA.G;
-                break;
-            case "PG":
-                name =  RatingsMPA.PG;
-                break;
-            case "PG_13":
-                name =  RatingsMPA.PG_13;
-                break;
-            case "R":
-                name =  RatingsMPA.R;
-                break;
-            case "NC_17":
-                name = RatingsMPA.NC_17;
-                break;
-        }
-        return name;
-    }*/
 }
 

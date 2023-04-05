@@ -18,10 +18,6 @@ import java.util.List;
 public class RatingController {
     @Autowired
     FilmService filmService;
-   /* @Autowired
-    public RatingController(FilmService filmService) {
-        this.filmService = filmService;
-    }*/
 
     @GetMapping
     public List<Rating> getRatings() {

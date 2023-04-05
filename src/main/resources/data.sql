@@ -24,7 +24,6 @@ MERGE INTO ratings
     WHEN NOT MATCHED THEN INSERT VALUES (5, 'NC-17', 'Лицам до 18 лет просмотр запрещен.');
 
 
-
 MERGE INTO genres
     USING (VALUES (1, 'Комедия')) s(GENRE_ID, GENRE_NAME)
     ON genres.GENRE_ID = s.GENRE_ID
@@ -55,7 +54,33 @@ MERGE INTO genres
     ON genres.GENRE_ID = s.GENRE_ID
     WHEN NOT MATCHED THEN INSERT VALUES (6, 'Боевик');
 
-/*MERGE INTO genres
-    USING (VALUES (7, 'фантастика')) s(GENRE_ID, GENRE_NAME)
-    ON genres.GENRE_ID = s.GENRE_ID
-    WHEN NOT MATCHED THEN INSERT VALUES (7, 'фантастика');*/
+
+
+
+/*
+MERGE INTO users
+    USING (VALUES (1, 'UserName1', 'Login1', 'email1@email.com', '1990-05-05')) s(ID, NAME , LOGIN, EMAIL, BIRTHDAY)
+    ON users.ID = s.ID
+    WHEN NOT MATCHED THEN INSERT VALUES (1, 'UserName1', 'Login1', 'email1@email.com', '1990-05-05');
+
+MERGE INTO users
+    USING (VALUES (2, 'UserName2', 'Login2', 'email2@email.com', '1990-06-06')) s(ID, NAME , LOGIN, EMAIL, BIRTHDAY)
+    ON users.ID = s.ID
+    WHEN NOT MATCHED THEN INSERT VALUES (2, 'UserName2', 'Login2', 'email2@email.com', '1990-06-06');
+
+MERGE INTO users
+    USING (VALUES (3, 'UserName3', 'Login3', 'email3@email.com', '1990-07-07')) s(ID, NAME , LOGIN, EMAIL, BIRTHDAY)
+    ON users.ID = s.ID
+    WHEN NOT MATCHED THEN INSERT VALUES (3, 'UserName3', 'Login3', 'email3@email.com', '1990-07-07');
+
+
+
+MERGE INTO films
+    USING (VALUES (1, 'Матрица', 'Классный фильм', '1999-10-14', 120, 4)) s(ID, NAME , DESCRIPTION, RELEASE_DATE, DURATION, RATING_ID)
+    ON films.ID = s.ID
+    WHEN NOT MATCHED THEN INSERT VALUES (1, 'Матрица', 'Классный фильм', '1999-10-14', 120, 4);
+
+MERGE INTO films
+    USING (VALUES (2, 'Матрица2', 'Классный фильм2', '1899-10-14', 120, 4)) s(ID, NAME , DESCRIPTION, RELEASE_DATE, DURATION, RATING_ID)
+    ON films.ID = s.ID
+    WHEN NOT MATCHED THEN INSERT VALUES (2, 'Матрица2', 'Классный фильм2', '1899-10-14', 120, 4);*/

@@ -18,11 +18,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-  /*  @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }*/
-
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();

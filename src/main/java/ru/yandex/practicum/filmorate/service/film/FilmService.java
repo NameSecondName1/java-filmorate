@@ -8,15 +8,15 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.storage.Genre.GenresStorage;
+import ru.yandex.practicum.filmorate.storage.Likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 import static ru.yandex.practicum.filmorate.Constants.SORTS;
 
 @Service
@@ -24,11 +24,15 @@ import static ru.yandex.practicum.filmorate.Constants.SORTS;
 public class FilmService {
     FilmStorage filmStorage;
     UserStorage userStorage;
+    LikesStorage likesStorage;
+    GenresStorage genresStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, LikesStorage likesStorage, GenresStorage genresStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likesStorage = likesStorage;
+        this.genresStorage = genresStorage;
     }
 
     public List<Film> getAllFilms() {
@@ -77,7 +81,7 @@ public class FilmService {
             log.debug("Пользователя с id = {} уже ставил лайк выбранному фильму.",userId);
             throw new AlreadyLikedException("Пользователь с выбранным id уже лайкал данный фильм.");
         }*/
-        filmStorage.addLike(filmId, userId);
+        likesStorage.addLike(filmId, userId);
     }
 
     public void deleteLike(long filmId, long userId) {
@@ -93,7 +97,7 @@ public class FilmService {
             log.debug("Пользователь с id = {} не ставил лайк выбранному фильму.",userId);
             throw new NoLikeException("Пользователь с выбранным id не ставил лайк выбранному фильму.");
         }*/
-        filmStorage.deleteLike(filmId, userId);
+        likesStorage.deleteLike(filmId, userId);
     }
 
     public List<Film> getPopularFilms(int count, String sort) {
@@ -103,12 +107,9 @@ public class FilmService {
         if (count <= 0) {
             throw new IncorrectParameterException("size");
         }
-        return new ArrayList<>(filmStorage.getAllFilms().values()).stream()
-                .sorted((f0, f1) -> compare(f0, f1, sort))
-                .limit(count)
-                .collect(Collectors.toList());
-    }
 
+        return likesStorage.getPopularFilms(count);
+    }
 
     private boolean isValid(Film film) {
         if ((film.getName() == null) || (film.getName().equals(""))) {
@@ -128,22 +129,14 @@ public class FilmService {
         }
     }
 
-    private int compare(Film f0, Film f1, String sort) {
-        int result = f0.getLikes().size() - (f1.getLikes().size()); //прямой порядок сортировки
-        if (sort.equals(DESCENDING_ORDER)) {
-            result = -1 * result; //обратный порядок сортировки
-        }
-        return result;
-    }
-
     public List<Genre> getGenres() {
         log.debug("Пользователь запросил просмотр списка всех жанров.");
-        return filmStorage.getGenres();
+        return genresStorage.getGenres();
     }
 
     public Genre getGenreById(int id) {
         log.debug("Пользователь запросил название жанра с id = {}", id);
-        return filmStorage.getGenreById(id);
+        return genresStorage.getGenreById(id);
     }
 
     public List<Rating> getRatings() {
@@ -155,4 +148,23 @@ public class FilmService {
         log.debug("Пользователь запросил название рейтинга с id = {}", id);
         return filmStorage.getRatingById(id);
     }
+
+
+
+
+
+
+
+/*  return new ArrayList<>(filmStorage.getAllFilms().values()).stream()
+                .sorted((f0, f1) -> compare(f0, f1, sort))
+                .limit(count)
+                .collect(Collectors.toList());*/
+/*    private int compare(Film f0, Film f1, String sort) {
+        int result = f0.getLikes().size() - (f1.getLikes().size()); //прямой порядок сортировки
+        if (sort.equals(DESCENDING_ORDER)) {
+            result = -1 * result; //обратный порядок сортировки
+        }
+        return result;
+    }*/
+
 }
