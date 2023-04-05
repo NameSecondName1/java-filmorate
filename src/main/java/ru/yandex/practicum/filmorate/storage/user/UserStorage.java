@@ -11,5 +11,5 @@ public interface UserStorage {
     User update(User user);
     boolean isContainId(long id);
     User getUserById(long id);
-    List<User> getUsersByIds(List<Long> friends);
+ //   List<User> getUsersByIds(List<Long> friends);
 }

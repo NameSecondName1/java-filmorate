@@ -110,7 +110,7 @@ public class UserDbStorage implements UserStorage {
     }
 
 
-    @Override
+/*    @Override
     public List<User> getUsersByIds(List<Long> friends) {
         List<User> users = new ArrayList<>();
         Map<Long, User> allUsers = getAllUsers();
@@ -118,5 +118,5 @@ public class UserDbStorage implements UserStorage {
             users.add(allUsers.get(element));
         }
         return users;
-    }
+    }*/
 }

@@ -74,13 +74,20 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public List<User> getAllFriends(long id) {
-        List<Long> friendsId = new ArrayList<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ?", id);
+        List<User> friends = new ArrayList<>();
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users, friendships " +
+                "where users.id = friendships.friend_id AND " +
+                "friendships.user_id = ?", id);
         while (userRows.next()) {
-            long x = userRows.getLong("friend_id");
-            friendsId.add(x);
+            User user = new User(userRows.getLong("id"),
+                    userRows.getString("email"),
+                    userRows.getString("login"),
+                    userRows.getString("name"),
+                    userRows.getDate("birthday").toLocalDate());
+            friends.add(user);
         }
-        return userStorage.getUsersByIds(friendsId);
+
+        return friends;
     }
 
     @Override
