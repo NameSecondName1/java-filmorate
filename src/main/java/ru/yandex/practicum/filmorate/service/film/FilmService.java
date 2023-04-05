@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.*;
@@ -15,8 +14,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
@@ -28,7 +25,7 @@ public class FilmService {
     FilmStorage filmStorage;
     UserStorage userStorage;
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -53,7 +50,7 @@ public class FilmService {
             return filmStorage.update(film);
         } else {
             log.debug("Фильма с id = {} не существует.",film.getId());
-            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+            throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
     }
 
@@ -62,39 +59,39 @@ public class FilmService {
             return filmStorage.getFilmById(id);
         } else {
             log.debug("Фильма с id = {} не существует.",id);
-            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+            throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
     }
 
     public void addLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             log.debug("Фильма с id = {} не существует.",filmId);
-            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+            throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
             log.debug("Пользователя с id = {} не существует.",userId);
-            throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
-        if (filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
+    /*    if (filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
             log.debug("Пользователя с id = {} уже ставил лайк выбранному фильму.",userId);
             throw new AlreadyLikedException("Пользователь с выбранным id уже лайкал данный фильм.");
-        }
+        }*/
         filmStorage.addLike(filmId, userId);
     }
 
     public void deleteLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             log.debug("Фильма с id = {} не существует.",filmId);
-            throw new FilmDoesNotExistException("Фильма с выбранным id не существует.");
+            throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
             log.debug("Пользователя с id = {} не существует.",userId);
-            throw new UserDoesNotExistException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
-        if (!filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
+      /*  if (!filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
             log.debug("Пользователь с id = {} не ставил лайк выбранному фильму.",userId);
             throw new NoLikeException("Пользователь с выбранным id не ставил лайк выбранному фильму.");
-        }
+        }*/
         filmStorage.deleteLike(filmId, userId);
     }
 

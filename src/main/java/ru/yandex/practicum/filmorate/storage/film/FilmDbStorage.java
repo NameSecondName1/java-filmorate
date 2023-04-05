@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.GenreDoesNotExistException;
-import ru.yandex.practicum.filmorate.exception.RatingDoesNotExistException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFountException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -13,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import java.util.*;
 
 @Slf4j
-@Component ("filmDbStorage")
+@Component
 public class FilmDbStorage implements FilmStorage{
 
     private final JdbcTemplate jdbcTemplate;
@@ -194,7 +193,7 @@ public class FilmDbStorage implements FilmStorage{
         if (filmRows.next()) {
             return new Genre(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
         } else {
-            throw new GenreDoesNotExistException("Не существует жанра с указанным id.");
+            throw new EntityNotFountException("Не существует жанра с указанным id.");
         }
     }
 
@@ -219,7 +218,7 @@ public class FilmDbStorage implements FilmStorage{
             return new Rating(id, filmRows.getString("rating_name"));
         }
         else {
-            throw new RatingDoesNotExistException("Не существует рейтинга с указанным id.");
+            throw new EntityNotFountException("Не существует рейтинга с указанным id.");
         }
     }
 

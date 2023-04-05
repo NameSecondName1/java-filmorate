@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 
 @Slf4j
-@Component("userDbStorage")
+@Component
 public class UserDbStorage implements UserStorage{
 
     private long globalId = 1;

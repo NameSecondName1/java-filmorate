@@ -3,20 +3,16 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @RestController
-//@RequestMapping({"/films"})
 @Slf4j
 
 public class FilmController {
