@@ -24,6 +24,7 @@ import static ru.yandex.practicum.filmorate.Constants.SORTS;
 public class FilmService {
     FilmStorage filmStorage;
     UserStorage userStorage;
+
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
@@ -35,9 +36,9 @@ public class FilmService {
         return new ArrayList<>(filmStorage.getAllFilms().values());
     }
 
-    public Film create(Film film){
+    public Film create(Film film) {
         if (isValid(film)) {
-            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(),film.getId()+1);
+            log.info("Добавлен новый фильм: {}, присвоенный ему id = {}.", film.getName(), film.getId() + 1);
         }
         return filmStorage.create(film);
     }
@@ -45,31 +46,31 @@ public class FilmService {
     public Film update(Film film) {
         if (filmStorage.isContainId(film.getId())) {
             if (isValid(film)) {
-                log.info("Фильм с id = {} успешно обновлен.",film.getId());
+                log.info("Фильм с id = {} успешно обновлен.", film.getId());
             }
             return filmStorage.update(film);
         } else {
-            log.debug("Фильма с id = {} не существует.",film.getId());
+            //  log.debug("Фильма с id = {} не существует.",film.getId());
             throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
     }
 
-    public Film getFilmById (@PathVariable long id) {
+    public Film getFilmById(@PathVariable long id) {
         if (filmStorage.isContainId(id)) {
             return filmStorage.getFilmById(id);
         } else {
-            log.debug("Фильма с id = {} не существует.",id);
+            //  log.debug("Фильма с id = {} не существует.",id);
             throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
     }
 
     public void addLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
-            log.debug("Фильма с id = {} не существует.",filmId);
+            //   log.debug("Фильма с id = {} не существует.",filmId);
             throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
-            log.debug("Пользователя с id = {} не существует.",userId);
+            //   log.debug("Пользователя с id = {} не существует.",userId);
             throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
     /*    if (filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
@@ -81,11 +82,11 @@ public class FilmService {
 
     public void deleteLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
-            log.debug("Фильма с id = {} не существует.",filmId);
+            //  log.debug("Фильма с id = {} не существует.",filmId);
             throw new EntityNotFountException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
-            log.debug("Пользователя с id = {} не существует.",userId);
+            //  log.debug("Пользователя с id = {} не существует.",userId);
             throw new EntityNotFountException("Пользователя с выбранным id не существует.");
         }
       /*  if (!filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
@@ -110,22 +111,23 @@ public class FilmService {
 
 
     private boolean isValid(Film film) {
-        if ((film.getName() == null)||(film.getName().equals(""))) {
-            log.debug("Фильм содержит пустое название.");
+        if ((film.getName() == null) || (film.getName().equals(""))) {
+            //  log.debug("Фильм содержит пустое название.");
             throw new ValidationException("Название не может быть пустым.");
         } else if (film.getDescription().length() > 200) {
-            log.debug("У фильма {} слишком длинное описание = {}, max = 200.",film.getName(),film.getDescription().length());
+            //  log.debug("У фильма {} слишком длинное описание = {}, max = 200.",film.getName(),film.getDescription().length());
             throw new ValidationException("Длина поля description не должна превышать 200 символов.");
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
-            log.debug("У фильма {} некорректная дата релиза: {}, min: 1895.12.28",film.getName(),film.getReleaseDate());
+        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            //  log.debug("У фильма {} некорректная дата релиза: {}, min: 1895.12.28",film.getName(),film.getReleaseDate());
             throw new ValidationException("Дата релиза не может быть ранее, чем 28 декабря 1895 года. (1895.12.28)");
         } else if (film.getDuration() <= 0) {
-            log.debug("У фильма {} некорректно указана длительность: {}, min = 1",film.getName(),film.getDuration());
+            //   log.debug("У фильма {} некорректно указана длительность: {}, min = 1",film.getName(),film.getDuration());
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         } else {
             return true;
         }
     }
+
     private int compare(Film f0, Film f1, String sort) {
         int result = f0.getLikes().size() - (f1.getLikes().size()); //прямой порядок сортировки
         if (sort.equals(DESCENDING_ORDER)) {

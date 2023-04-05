@@ -12,13 +12,13 @@ import java.util.*;
 
 @Slf4j
 @Component
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
 
     private long globalId = 1;
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate=jdbcTemplate;
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -37,7 +37,6 @@ public class UserDbStorage implements UserStorage{
         }
 
 
-
         while (friendshipRows.next()) {
             if (friendshipRows.getString("friendship_status").equals("CONFIRMED")) {
                 result.get(friendshipRows.getLong("user_id")).getFriendshipStatuses().
@@ -47,7 +46,6 @@ public class UserDbStorage implements UserStorage{
                         put(friendshipRows.getLong("friend_id"), Friendship.UNCONFIRMED);
             }
         }
-
 
 
         return result;
@@ -170,8 +168,9 @@ public class UserDbStorage implements UserStorage{
         }
         return getUsersByIds(friendsId);
     }
+
     @Override
-    public List<User> friendsOfBothUsers (long firstId, long secondId) {
+    public List<User> friendsOfBothUsers(long firstId, long secondId) {
         List<User> friendsOfBoth = new ArrayList<>();
   /*      List<User> firstFriends = getAllFriends(firstId);
         List<User> secondFriends = getAllFriends(secondId);
@@ -194,12 +193,13 @@ public class UserDbStorage implements UserStorage{
         }
         return friendsOfBoth;
     }
+
     @Override
     public List<User> getUsersByIds(List<Long> friends) {
         List<User> users = new ArrayList<>();
         Map<Long, User> allUsers = getAllUsers();
         for (Long element : friends) {
-           users.add(allUsers.get(element));
+            users.add(allUsers.get(element));
         }
         return users;
     }
