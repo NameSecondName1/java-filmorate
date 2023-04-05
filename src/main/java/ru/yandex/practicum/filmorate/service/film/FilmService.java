@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.Genre.GenresStorage;
 import ru.yandex.practicum.filmorate.storage.Likes.LikesStorage;
+import ru.yandex.practicum.filmorate.storage.Rating.RatingsStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -26,13 +27,15 @@ public class FilmService {
     UserStorage userStorage;
     LikesStorage likesStorage;
     GenresStorage genresStorage;
+    RatingsStorage ratingsStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage, LikesStorage likesStorage, GenresStorage genresStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, LikesStorage likesStorage, GenresStorage genresStorage, RatingsStorage ratingsStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likesStorage = likesStorage;
         this.genresStorage = genresStorage;
+        this.ratingsStorage = ratingsStorage;
     }
 
     public List<Film> getAllFilms() {
@@ -141,12 +144,12 @@ public class FilmService {
 
     public List<Rating> getRatings() {
         log.debug("Пользователь запросил просмотр списка всех рейтингов.");
-        return filmStorage.getRatings();
+        return ratingsStorage.getRatings();
     }
 
     public Rating getRatingById(int id) {
         log.debug("Пользователь запросил название рейтинга с id = {}", id);
-        return filmStorage.getRatingById(id);
+        return ratingsStorage.getRatingById(id);
     }
 
 

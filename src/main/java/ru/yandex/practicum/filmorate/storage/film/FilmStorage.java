@@ -14,7 +14,4 @@ public interface FilmStorage {
     boolean isContainId (long id);
     Film getFilmById (long id);
 
-    List<Rating> getRatings();
-    Rating getRatingById(int id);
-
 }

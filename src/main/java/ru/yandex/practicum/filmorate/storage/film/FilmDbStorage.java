@@ -106,13 +106,6 @@ public class FilmDbStorage implements FilmStorage{
         return film;
     }
 
-
-    @Override
-    public boolean isContainId(long id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
-        return filmRows.next();
-    }
-
     @Override
     public Film getFilmById(long id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films AS F " +
@@ -140,28 +133,9 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public List<Rating> getRatings() {
-        List<Rating> ratings = new ArrayList<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from ratings");
-
-        while (filmRows.next()) {
-            Rating rating = new Rating(filmRows.getInt("rating_id"),
-                    filmRows.getString("rating_name"));
-            ratings.add(rating);
-        }
-        return ratings;
-    }
-
-    @Override
-    public Rating getRatingById(int id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from ratings where rating_id = ?", id);
-
-        if (filmRows.next()) {
-            return new Rating(id, filmRows.getString("rating_name"));
-        }
-        else {
-            throw new EntityNotFountException("Не существует рейтинга с указанным id.");
-        }
+    public boolean isContainId(long id) {
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
+        return filmRows.next();
     }
 }
 
