@@ -2,17 +2,20 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.*;
 
 @Slf4j
 @Component
 public class UserDbStorage implements UserStorage {
-    private long globalId = 1;
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -51,16 +54,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        user.setId(globalId);
-        globalId++;
-        String sqlQuery = "insert into USERS(id, name, login, email, birthday) " +
-                "values (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                user.getName(),
-                user.getLogin(),
-                user.getEmail(),
-                user.getBirthday());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO users (name, login, email, birthday) " +
+                    "VALUES (?, ?, ?, ?)", new String[] {"id"});
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getEmail());
+            ps.setDate(4, Date.valueOf(user.getBirthday()));
+            return ps;
+        }, keyHolder);
+        long generatedId = keyHolder.getKey().longValue();
+
+        user.setId(generatedId);
         return user;
     }
 
