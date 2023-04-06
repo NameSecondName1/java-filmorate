@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 public class Rating {
     private int id;
-   // private RatingsMPA name;
    private String name;
 
     public Rating(int id, String name) {

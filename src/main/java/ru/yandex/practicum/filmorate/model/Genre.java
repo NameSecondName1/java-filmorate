@@ -2,22 +2,22 @@ package ru.yandex.practicum.filmorate.model;
 
 
 public class Genre {
-    private int id;
+    private long id;
     private String name;
 
-    public Genre(int id, String name) {
+    public Genre(long id, String name) {
         this.id = id;
         this.name = name;
     }
-    public Genre(int id) {
+    public Genre(long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

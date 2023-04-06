@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.Genre;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.EntityNotFountException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
@@ -16,61 +15,21 @@ public class GenresDbStorage implements GenresStorage{
         this.jdbcTemplate = jdbcTemplate;
     }
 
-@Override
-    public void updateGenres(Set<Genre> genresId, long id) {
-    SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film_genres where film_id = ?", id);
-    Set<Genre> genresToAdd = genresId;
-    Set<Genre> genresToRemove = new HashSet<>();
-    while (filmRows.next()) {
-        Genre genre = new Genre(filmRows.getInt("genre_id"));
-        if (genresToAdd.contains(genre)) {
-            genresToAdd.remove(genre);
-        } else {
-            genresToRemove.add(genre);
-        }
-    }
-     if (!genresToRemove.isEmpty()) {
-        List<Object[]> batchArgs = new ArrayList<>();
-        for (Genre genre : genresToRemove) {
-            batchArgs.add(new Object[]{id, genre.getId()});
-          }
-        String sql = "DELETE FROM film_genres WHERE film_id = ? AND genre_id = ?";
-        jdbcTemplate.batchUpdate(sql, batchArgs);
-        }
-    insertGenres(genresToAdd, id);
-    }
-
     @Override
     public List<Genre> getGenres() {
-        List<Genre> genres = new ArrayList<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genres ORDER BY genre_id ASC");
-        while (filmRows.next()) {
-            Genre genre = new Genre(filmRows.getInt("genre_id"),
-                    filmRows.getString("genre_name"));
-            genres.add(genre);
-        }
+        String sql = "SELECT * FROM genres ORDER BY genre_id ASC";
+        List<Genre> genres = jdbcTemplate.query(sql, new GenreRowMapper());
         return genres;
     }
 
     @Override
-    public Genre getGenreById(int id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genres where genre_id = ?", id);
-        if (filmRows.next()) {
-            return new Genre(filmRows.getInt("genre_id"), filmRows.getString("genre_name"));
+    public Genre getGenreById(long id) {
+        String sql = "SELECT * FROM genres WHERE genre_id = ?";
+        List<Genre> genres = jdbcTemplate.query(sql, new Object[]{id}, new GenreRowMapper());
+        if (!genres.isEmpty()) {
+            return genres.get(0);
         } else {
-            throw new EntityNotFountException("Не существует жанра с указанным id.");
-        }
-    }
-
-    @Override
-    public void insertGenres(Set<Genre> genresId, long id) {
-        if (!genresId.isEmpty()) {
-            List<Object[]> batchArgs = new ArrayList<>();
-            for (Genre genre : genresId) {
-                batchArgs.add(new Object[] { id, genre.getId() });
-            }
-            String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-            jdbcTemplate.batchUpdate(sql, batchArgs);
+            throw new EntityNotFoundException("Не существует жанра с указанным id.");
         }
     }
 

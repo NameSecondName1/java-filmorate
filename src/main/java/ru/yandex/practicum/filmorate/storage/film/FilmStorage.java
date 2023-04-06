@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 
-import java.util.List;
 import java.util.Map;
 
 public interface FilmStorage {
@@ -13,5 +10,6 @@ public interface FilmStorage {
     Film update(Film film);
     boolean isContainId (long id);
     Film getFilmById (long id);
-
+  //  void insertGenres(Set<Genre> genresId, long id);
+  //  void updateGenres(Set<Genre> genresId, long id);
 }

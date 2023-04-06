@@ -58,7 +58,7 @@ public class FilmService {
             return filmStorage.update(film);
         } else {
             //  log.debug("Фильма с id = {} не существует.",film.getId());
-            throw new EntityNotFountException("Фильма с выбранным id не существует.");
+            throw new EntityNotFoundException("Фильма с выбранным id не существует.");
         }
     }
 
@@ -67,18 +67,18 @@ public class FilmService {
             return filmStorage.getFilmById(id);
         } else {
             //  log.debug("Фильма с id = {} не существует.",id);
-            throw new EntityNotFountException("Фильма с выбранным id не существует.");
+            throw new EntityNotFoundException("Фильма с выбранным id не существует.");
         }
     }
 
     public void addLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             //   log.debug("Фильма с id = {} не существует.",filmId);
-            throw new EntityNotFountException("Фильма с выбранным id не существует.");
+            throw new EntityNotFoundException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
             //   log.debug("Пользователя с id = {} не существует.",userId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
     /*    if (filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
             log.debug("Пользователя с id = {} уже ставил лайк выбранному фильму.",userId);
@@ -90,11 +90,11 @@ public class FilmService {
     public void deleteLike(long filmId, long userId) {
         if (!filmStorage.isContainId(filmId)) {
             //  log.debug("Фильма с id = {} не существует.",filmId);
-            throw new EntityNotFountException("Фильма с выбранным id не существует.");
+            throw new EntityNotFoundException("Фильма с выбранным id не существует.");
         }
         if (!userStorage.isContainId(userId)) {
             //  log.debug("Пользователя с id = {} не существует.",userId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
       /*  if (!filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
             log.debug("Пользователь с id = {} не ставил лайк выбранному фильму.",userId);
@@ -137,7 +137,7 @@ public class FilmService {
         return genresStorage.getGenres();
     }
 
-    public Genre getGenreById(int id) {
+    public Genre getGenreById(long id) {
         log.debug("Пользователь запросил название жанра с id = {}", id);
         return genresStorage.getGenreById(id);
     }

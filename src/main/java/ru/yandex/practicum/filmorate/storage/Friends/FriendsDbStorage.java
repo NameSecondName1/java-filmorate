@@ -22,9 +22,8 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public void addToFriends(long userId, long friendId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
+     /*   SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
         if (userRows.next()) {
-
             String sqlQuery = "update friendships set " +
                     "friendship_status = ?" +
                     "where friendship_id = ?";
@@ -46,7 +45,12 @@ public class FriendsDbStorage implements FriendsStorage{
                     userId,
                     friendId,
                     "UNCONFIRMED");
-        }
+        }*/
+        String sqlQuery = "insert into friendships (user_id, friend_id)" +
+                "values (?, ?)";
+        jdbcTemplate.update(sqlQuery,
+                userId,
+                friendId);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public void deleteFromFriend(long userId, long friendId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
+   /*     SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
         if (userRows.next()) {
             String sqlQuery = "update friendships set " +
                     "friendship_status = ?" +
@@ -65,10 +69,9 @@ public class FriendsDbStorage implements FriendsStorage{
             jdbcTemplate.update(sqlQuery,
                     "UNCONFIRMED",
                     userRows.getLong("friendship_id"));
-        }
+        }*/
         String sqlQuery = "delete from friendships " +
                 "where user_id = ? and friend_id = ?";
-
         jdbcTemplate.update(sqlQuery, userId, friendId);
     }
 

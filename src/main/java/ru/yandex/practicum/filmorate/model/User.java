@@ -1,13 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 
 
 public class User {
@@ -16,7 +10,6 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-  //  private Map<Long, Friendship> friendshipStatuses = new HashMap<>();
 
     public User(long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -67,11 +60,16 @@ public class User {
         this.birthday = birthday;
     }
 
-/*    public Map<Long, Friendship> getFriendshipStatuses() {
-        return friendshipStatuses;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
     }
 
-    public void setFriendshipStatuses(Map<Long, Friendship> friendshipStatuses) {
-        this.friendshipStatuses = friendshipStatuses;
-    }*/
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

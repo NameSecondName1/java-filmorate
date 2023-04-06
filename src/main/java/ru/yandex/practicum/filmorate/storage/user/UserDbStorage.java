@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -11,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
@@ -23,10 +26,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getAllUsers() {
-        Map<Long, User> result = new HashMap<>();
+    /*public List<User> getAllUsers() {
+        List<User> result = new ArrayList<>();
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS AS U ORDER BY U.ID ASC");
-      //  SqlRowSet friendshipRows = jdbcTemplate.queryForRowSet("select * from FRIENDSHIPS");
 
         while (userRows.next()) {
             User user = new User(userRows.getLong("id"),
@@ -34,21 +36,13 @@ public class UserDbStorage implements UserStorage {
                     userRows.getString("login"),
                     userRows.getString("name"),
                     userRows.getDate("birthday").toLocalDate());
-            result.put(user.getId(), user);
+            result.add(user);
         }
-
-
-/*        while (friendshipRows.next()) {
-            if (friendshipRows.getString("friendship_status").equals("CONFIRMED")) {
-                result.get(friendshipRows.getLong("user_id")).getFriendshipStatuses().
-                        put(friendshipRows.getLong("friend_id"), Friendship.CONFIRMED);
-            } else {
-                result.get(friendshipRows.getLong("user_id")).getFriendshipStatuses().
-                        put(friendshipRows.getLong("friend_id"), Friendship.UNCONFIRMED);
-            }
-        }*/
-
         return result;
+    }*/
+    public List<User> getAllUsers() {
+        String sql = "SELECT * FROM users ORDER BY id ASC";
+        return jdbcTemplate.query(sql, new UserRowMapper());
     }
 
     @Override
@@ -90,7 +84,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(long id) {
+    /*public User getUserById(long id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
         userRows.next();
         User user = new User(userRows.getLong("id"),
@@ -98,25 +92,14 @@ public class UserDbStorage implements UserStorage {
                 userRows.getString("login"),
                 userRows.getString("name"),
                 userRows.getDate("birthday").toLocalDate());
-   /*     SqlRowSet friendshipRows = jdbcTemplate.queryForRowSet("select * from FRIENDSHIPS where user_id = ?", id);
-        while (friendshipRows.next()) {
-            if (friendshipRows.getString("friendship_status").equals("CONFIRMED")) {
-                user.getFriendshipStatuses().put(friendshipRows.getLong("friend_id"), Friendship.CONFIRMED);
-            } else {
-                user.getFriendshipStatuses().put(friendshipRows.getLong("friend_id"), Friendship.UNCONFIRMED);
-            }
-        }*/
+        return user;
+    }*/
+    public User getUserById(long id) {
+        String sql = "select * from users where id = ?";
+        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
         return user;
     }
 
-
-/*    @Override
-    public List<User> getUsersByIds(List<Long> friends) {
-        List<User> users = new ArrayList<>();
-        Map<Long, User> allUsers = getAllUsers();
-        for (Long element : friends) {
-            users.add(allUsers.get(element));
-        }
-        return users;
-    }*/
 }
+
+

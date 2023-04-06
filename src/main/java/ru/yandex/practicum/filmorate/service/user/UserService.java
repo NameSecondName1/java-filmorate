@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.Friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,7 +24,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.getAllUsers().values());
+        return userStorage.getAllUsers();
     }
 
     public User create(User user) {
@@ -49,13 +48,13 @@ public class UserService {
             return userStorage.update(user);
         } else {
             //  log.debug("Пользователя с id = {} не существует.",user.getId());
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
     }
 
     public User getUserById(long id) {
         if (!userStorage.isContainId(id)) {
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         return userStorage.getUserById(id);
     }
@@ -63,11 +62,11 @@ public class UserService {
     public void addToFriends(long userId, long friendId) {
         if (!userStorage.isContainId(userId)) {
             //   log.debug("Пользователя с id = {} не существует.", userId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         if (!userStorage.isContainId(friendId)) {
             //   log.debug("Пользователя с id = {} не существует.", friendId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         if (isAlreadyFriend(userId, friendId)) {
             //  log.debug("Пользователь с id = {} уже в списке друзей у юзера с id = {}.", friendId, userId);
@@ -81,11 +80,11 @@ public class UserService {
     public void deleteInviteToFriend(long userId, long friendId) {
         if (!userStorage.isContainId(userId)) {
             //   log.debug("Пользователя с id = {} не существует.", userId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         if (!userStorage.isContainId(friendId)) {
             //  log.debug("Пользователя с id = {} не существует.", friendId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         if (isAlreadyFriend(userId, friendId)) {
             log.debug("У юзера с id = {} удален из списка друзей юзер с id = {}.", userId, friendId);
@@ -99,7 +98,7 @@ public class UserService {
     public List<User> getAllFriends(long id) {
         if (!userStorage.isContainId(id)) {
             //    log.debug("Пользователя с id = {} не существует.", id);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         log.debug("Запрошен список id друзей юзера с id = {} .", id);
         return friendsStorage.getAllFriends(id);
@@ -108,11 +107,11 @@ public class UserService {
     public List<User> friendsOfBothUsers(long firstId, long secondId) {
         if (!userStorage.isContainId(firstId)) {
             //   log.debug("Пользователя с id = {} не существует.", firstId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         if (!userStorage.isContainId(secondId)) {
             //   log.debug("Пользователя с id = {} не существует.", secondId);
-            throw new EntityNotFountException("Пользователя с выбранным id не существует.");
+            throw new EntityNotFoundException("Пользователя с выбранным id не существует.");
         }
         log.debug("Запрошен список id общих друзей юзеров с id = {} и id = {}.", firstId, secondId);
         return friendsStorage.friendsOfBothUsers(firstId, secondId);
