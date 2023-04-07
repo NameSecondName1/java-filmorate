@@ -22,30 +22,6 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public void addToFriends(long userId, long friendId) {
-     /*   SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
-        if (userRows.next()) {
-            String sqlQuery = "update friendships set " +
-                    "friendship_status = ?" +
-                    "where friendship_id = ?";
-            jdbcTemplate.update(sqlQuery,
-                    "CONFIRMED",
-                    userRows.getLong("friendship_id"));
-
-            sqlQuery = "insert into friendships (user_id, friend_id, friendship_status)" +
-                    "values (?, ?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    userId,
-                    friendId,
-                    "CONFIRMED");
-
-        } else {
-            String sqlQuery = "insert into friendships (user_id, friend_id, friendship_status)" +
-                    "values (?, ?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    userId,
-                    friendId,
-                    "UNCONFIRMED");
-        }*/
         String sqlQuery = "insert into friendships (user_id, friend_id)" +
                 "values (?, ?)";
         jdbcTemplate.update(sqlQuery,
@@ -61,15 +37,6 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public void deleteFromFriend(long userId, long friendId) {
-   /*     SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from friendships where user_id = ? and friend_id = ?", friendId, userId);
-        if (userRows.next()) {
-            String sqlQuery = "update friendships set " +
-                    "friendship_status = ?" +
-                    "where friendship_id = ?";
-            jdbcTemplate.update(sqlQuery,
-                    "UNCONFIRMED",
-                    userRows.getLong("friendship_id"));
-        }*/
         String sqlQuery = "delete from friendships " +
                 "where user_id = ? and friend_id = ?";
         jdbcTemplate.update(sqlQuery, userId, friendId);

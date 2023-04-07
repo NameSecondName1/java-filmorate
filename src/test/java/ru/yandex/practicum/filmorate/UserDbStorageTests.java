@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UserDbStorageTests {
     User user1;
     User user2;
+    @Autowired
     private UserDbStorage userStorage;
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -33,36 +34,24 @@ public class UserDbStorageTests {
     public void beforeEach () {
         jdbcTemplate.execute("DELETE FROM users");
 
-        user1 = new User(1, null, null, null, null);
-        user1.setName("Test User 1");
-        user1.setLogin("testUser1");
-        user1.setEmail("testuser1@example.com");
-        user1.setBirthday(LocalDate.of(2000, 1, 1));
+        user1 = new User(1, "testuser1@example.com", "testUser1",
+                "TestUser1", LocalDate.of(2000, 1, 1));
 
-        user2 = new User(2, null, null, null, null);
-        user2.setName("Test User 2");
-        user2.setLogin("testuser2");
-        user2.setEmail("testuser2@example.com");
-        user2.setBirthday(LocalDate.of(2000, 2, 2));
-
-        userStorage = new UserDbStorage(jdbcTemplate);
+        user2 = new User(2, "testuser2@example.com", "testUser2",
+                "TestUser2", LocalDate.of(2000, 2, 2));
     }
 
-   /* @AfterEach
-    public void clearData() {
-        jdbcTemplate.execute("DELETE FROM users");
-    }*/
 
     @Test
     public void testGetUserById() {
         userStorage.create(user1);
 
-        Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(1));
+        Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(user1.getId()));
 
         assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1L)
+                        assertThat(user).hasFieldOrPropertyWithValue("id", user1.getId())
                 );
     }
 
@@ -103,7 +92,7 @@ public class UserDbStorageTests {
         user1.setBirthday(LocalDate.of(2000, 2, 2));
         userStorage.update(user1);
 
-        User updatedUser = userStorage.getUserById(1);
+        User updatedUser = userStorage.getUserById(user1.getId());
 
         assertThat(updatedUser)
                 .isEqualTo(user1)

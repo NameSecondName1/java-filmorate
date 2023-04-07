@@ -13,7 +13,7 @@ friend_id long REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS ratings (
-rating_id long PRIMARY KEY,
+rating_id int PRIMARY KEY,
 rating_name varchar (100) NOT NULL,
 rating_description varchar(500)
 );
