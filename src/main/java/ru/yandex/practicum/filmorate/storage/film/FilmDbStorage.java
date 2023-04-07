@@ -41,27 +41,6 @@ public class FilmDbStorage implements FilmStorage{
         }
         return films;
     }
-/*    public Map<Long, Film> getAllFilms() {
-    Map<Long, Film> films = new HashMap<>();
-    String filmSql = "SELECT F.*, R.rating_name, R.rating_description " +
-            "FROM films AS F " +
-            "LEFT JOIN ratings AS R ON F.rating_id = R.rating_id";
-    List<Film> filmList = jdbcTemplate.query(filmSql, new FilmRowMapper());
-    for (Film film : filmList) {
-        films.put(film.getId(), film);
-    }
-    String genreSql = "SELECT FG.film_id, G.* " +
-            "FROM film_genres AS FG " +
-            "LEFT JOIN genres AS G ON FG.genre_id = G.genre_id";
-    List<Genre> genreList = jdbcTemplate.query(genreSql, new GenreRowMapper());
-    for (Genre genre : genreList) {
-        Film film = films.get(genre.getId());
-        if (film != null) {
-            film.getGenres().add(genre);
-        }
-    }
-    return films;
-}*/
 
     @Override
     public Film create(Film film) {
@@ -84,7 +63,6 @@ public class FilmDbStorage implements FilmStorage{
         film.setId(generatedId);
         return film;
     }
-
 
     @Override
     public Film update(Film film) {
@@ -128,29 +106,11 @@ public class FilmDbStorage implements FilmStorage{
         return film;
     }
 
-
-    private void updateGenres(Set<Genre> genresId, long id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film_genres where film_id = ?", id);
-        Set<Genre> genresToAdd = genresId;
-        Set<Genre> genresToRemove = new HashSet<>();
-        while (filmRows.next()) {
-            Genre genre = new Genre(filmRows.getInt("genre_id"));
-            if (genresToAdd.contains(genre)) {
-                genresToAdd.remove(genre);
-            } else {
-                genresToRemove.add(genre);
-            }
-        }
-        if (!genresToRemove.isEmpty()) {
-            List<Object[]> batchArgs = new ArrayList<>();
-            for (Genre genre : genresToRemove) {
-                batchArgs.add(new Object[]{id, genre.getId()});
-            }
-            String sql = "DELETE FROM film_genres WHERE film_id = ? AND genre_id = ?";
-            jdbcTemplate.batchUpdate(sql, batchArgs);
-        }
-        insertGenres(genresToAdd, id);
-    }
+   private void updateGenres(Set<Genre> genresId, long id) {
+       String sqlDelete = "DELETE FROM film_genres WHERE film_id = ?";
+       jdbcTemplate.update(sqlDelete, id);
+       insertGenres(genresId, id);
+   }
 
     private void insertGenres(Set<Genre> genresId, long id) {
         if (!genresId.isEmpty()) {
@@ -162,7 +122,6 @@ public class FilmDbStorage implements FilmStorage{
             jdbcTemplate.batchUpdate(sql, batchArgs);
         }
     }
-
 
     @Override
     public boolean isContainId(long id) {

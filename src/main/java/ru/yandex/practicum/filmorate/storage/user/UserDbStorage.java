@@ -2,18 +2,14 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
@@ -26,20 +22,6 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    /*public List<User> getAllUsers() {
-        List<User> result = new ArrayList<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS AS U ORDER BY U.ID ASC");
-
-        while (userRows.next()) {
-            User user = new User(userRows.getLong("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
-            result.add(user);
-        }
-        return result;
-    }*/
     public List<User> getAllUsers() {
         String sql = "SELECT * FROM users ORDER BY id ASC";
         return jdbcTemplate.query(sql, new UserRowMapper());
@@ -84,16 +66,6 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    /*public User getUserById(long id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
-        userRows.next();
-        User user = new User(userRows.getLong("id"),
-                userRows.getString("email"),
-                userRows.getString("login"),
-                userRows.getString("name"),
-                userRows.getDate("birthday").toLocalDate());
-        return user;
-    }*/
     public User getUserById(long id) {
         String sql = "select * from users where id = ?";
         User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);

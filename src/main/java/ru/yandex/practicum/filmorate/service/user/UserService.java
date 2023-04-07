@@ -122,22 +122,32 @@ public class UserService {
     }
 
 
-    private boolean isValid(User user) {
+    /*private boolean isValid(User user) {
         if ((user.getEmail() == null) || (user.getEmail().equals(""))) {
-            //   log.debug("У пользователя {} указан пустой e-mail.",user.getName());
             throw new ValidationException("e-mail не должен быть пустым.");
         } else if (!(user.getEmail().contains("@"))) {
-            //   log.debug("У пользователя {} некорректно указан e-mail: {}",user.getName(),user.getEmail());
             throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
         } else if ((user.getLogin() == null) || (user.getLogin().equals(""))) {
-            //   log.debug("Пользователь пытается зарегестрироваться с пустым логином.");
             throw new ValidationException("Логин не должен быть пустым.");
         } else if (user.getLogin().contains(" ")) {
-            //   log.debug("У пользователя c id = {} некорректно указан логин: {}. Пробелы недопустимы.",user.getId(), user.getLogin());
             throw new ValidationException("Логин не должен содержать пробелы.");
         } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            //  log.debug("Пользователь {}, похоже, из будущего! Указанная дата рождения: {}.",user.getName(),user.getBirthday());
             throw new ValidationException("Дата рождения не может быть в будущем.");
+        } else {
+            return true;
+        }
+    }*/
+    private boolean isValid(User user) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new ValidationException("E-mail не должен быть пустым.");
+        } else if (!user.getEmail().contains("@")) {
+            throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
+        } else if (user.getLogin() == null || user.getLogin().isEmpty()) {
+            throw new ValidationException("Логин не должен быть пустым.");
+        } else if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не должен содержать пробелы.");
+        } else if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть в будущем или пустой.");
         } else {
             return true;
         }
