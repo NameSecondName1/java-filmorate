@@ -25,6 +25,7 @@ public class UserDbStorageTests {
 
     @BeforeEach
     public void beforeEach () {
+        jdbcTemplate.update("DELETE FROM friendships WHERE user_id IN (SELECT id FROM users)");
         jdbcTemplate.execute("DELETE FROM users");
     }
 
