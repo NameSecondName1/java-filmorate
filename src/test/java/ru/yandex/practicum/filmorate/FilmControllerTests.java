@@ -9,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -161,8 +164,6 @@ public class FilmControllerTests {
         assertEquals(film1.getGenres(), retrievedFilm.getGenres());
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     @Test
     public void getPopularFilmsTest() {
         filmController.create(film1);
@@ -206,4 +207,90 @@ public class FilmControllerTests {
         assertFalse(result.next());
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void getFilmWithWrongIdTest() {
+        filmController.create(film1);
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> filmController.getFilmById(666));
+        assertEquals("Фильма с выбранным id не существует.", exception.getMessage());
+    }
+
+    @Test
+    public void getPopularWithIncorrectSortTest() {
+        IncorrectParameterException exception = assertThrows(IncorrectParameterException.class,
+                () -> filmController.getPopularFilms(5, "wrongSort"));
+        assertEquals("sort", exception.getParameter());
+    }
+
+    @Test
+    public void getPopularWithIncorrectSizeTest() {
+        IncorrectParameterException exception = assertThrows(IncorrectParameterException.class,
+                () -> filmController.getPopularFilms(-5, DESCENDING_ORDER));
+        assertEquals("size", exception.getParameter());
+    }
+
+    @Test
+    public void createFilmWithEmptyNameTests() {
+        film1.setName("");
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Название не может быть пустым.", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithNullNameTests() {
+        film1.setName(null);
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Название не может быть пустым.", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithNullDescrTests() {
+        film1.setDescription(null);
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Поле description не должно быть пустым или превышать 200 символов.", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithTooLongDescrTests() {
+        film1.setDescription("TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong" +
+                "TooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLongTooLong");
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Поле description не должно быть пустым или превышать 200 символов.", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithNullDateTests() {
+        film1.setReleaseDate(null);
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Дата релиза не может быть пустой, либо ранее, чем 28 декабря 1895 года. (1895.12.28)", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithTooEarlyDateTests() {
+        film1.setReleaseDate(LocalDate.of(1000,1,1));
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Дата релиза не может быть пустой, либо ранее, чем 28 декабря 1895 года. (1895.12.28)", exception.getMessage());
+    }
+
+    @Test
+    public void createFilmWithIncorrectDurationTests() {
+        film1.setDuration(-100);
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmController.create(film1));
+        assertEquals("Продолжительность фильма должна быть положительной.", exception.getMessage());
+    }
 }
