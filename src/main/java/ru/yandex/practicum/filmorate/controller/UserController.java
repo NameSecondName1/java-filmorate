@@ -15,13 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class UserController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable long id) {
+        return userService.getUserById(id);
+    }
+
 
     @PostMapping
     public User create(@RequestBody User user) {
@@ -51,11 +56,6 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getFriendsOfBothUsers(@PathVariable long id, @PathVariable long otherId) {
         return userService.friendsOfBothUsers(id, otherId);
-    }
-
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable long id) {
-        return userService.getUserById(id);
     }
 
 }

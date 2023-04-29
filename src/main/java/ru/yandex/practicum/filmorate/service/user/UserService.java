@@ -139,7 +139,7 @@ public class UserService {
     }*/
     private boolean isValid(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new ValidationException("E-mail не должен быть пустым.");
+            throw new ValidationException("e-mail не должен быть пустым.");
         } else if (!user.getEmail().contains("@")) {
             throw new ValidationException("Некорректный формат e-mail. Необходим символ @.");
         } else if (user.getLogin() == null || user.getLogin().isEmpty()) {

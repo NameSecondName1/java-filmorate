@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +12,8 @@ import java.util.List;
 public class FriendsDbStorage implements FriendsStorage{
 
     private final JdbcTemplate jdbcTemplate;
-    UserStorage userStorage;
-
-    public FriendsDbStorage(JdbcTemplate jdbcTemplate, UserStorage userStorage) {
+    public FriendsDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userStorage = userStorage;
     }
 
     @Override
