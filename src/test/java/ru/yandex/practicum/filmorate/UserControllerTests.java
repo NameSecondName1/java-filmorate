@@ -37,11 +37,16 @@ public class UserControllerTests {
     UserController userController;
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    UserRowMapper userRowMapper;
 
     @BeforeEach
     public void BeforeEach() {
-        userController = new UserController(new UserService(new UserDbStorage(jdbcTemplate),
-                new FriendsDbStorage(jdbcTemplate)));
+        userController = new UserController(
+                new UserService(
+                        new UserDbStorage(jdbcTemplate,userRowMapper),
+                        new FriendsDbStorage(jdbcTemplate, userRowMapper))
+        );
 
         jdbcTemplate.execute("delete from friendships");
         jdbcTemplate.execute("DELETE FROM users");

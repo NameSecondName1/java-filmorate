@@ -11,11 +11,15 @@ import ru.yandex.practicum.filmorate.controller.RatingController;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.storage.Genre.GenreRowMapper;
 import ru.yandex.practicum.filmorate.storage.Genre.GenresDbStorage;
 import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
+import ru.yandex.practicum.filmorate.storage.Rating.RatingRowMapper;
 import ru.yandex.practicum.filmorate.storage.Rating.RatingsDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserRowMapper;
 
 import java.util.List;
 
@@ -29,11 +33,26 @@ public class RatingControllerTests {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    FilmRowMapper filmRowMapper;
+    @Autowired
+    GenreRowMapper genreRowMapper;
+    @Autowired
+    UserRowMapper userRowMapper;
+    @Autowired
+    RatingRowMapper ratingRowMapper;
+
     @BeforeEach
     public void setUp() {
-        ratingController = new RatingController(new FilmService(new FilmDbStorage(jdbcTemplate),
-                new UserDbStorage(jdbcTemplate), new LikesDbStorage(jdbcTemplate),
-                new GenresDbStorage(jdbcTemplate), new RatingsDbStorage(jdbcTemplate)));
+        ratingController = new RatingController(
+                new FilmService(
+                        new FilmDbStorage(jdbcTemplate, filmRowMapper, genreRowMapper),
+                        new UserDbStorage(jdbcTemplate, userRowMapper),
+                        new LikesDbStorage(jdbcTemplate, filmRowMapper),
+                        new GenresDbStorage(jdbcTemplate, genreRowMapper),
+                        new RatingsDbStorage(jdbcTemplate, ratingRowMapper)
+                )
+        );
         jdbcTemplate.execute("DELETE FROM ratings");
         jdbcTemplate.execute("INSERT INTO ratings (rating_id, rating_name) VALUES (1, 'rating1')");
         jdbcTemplate.execute("INSERT INTO ratings (rating_id, rating_name) VALUES (2, 'rating2')");

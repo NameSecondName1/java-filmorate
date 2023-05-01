@@ -17,11 +17,15 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.storage.Genre.GenreRowMapper;
 import ru.yandex.practicum.filmorate.storage.Genre.GenresDbStorage;
 import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
+import ru.yandex.practicum.filmorate.storage.Rating.RatingRowMapper;
 import ru.yandex.practicum.filmorate.storage.Rating.RatingsDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserRowMapper;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -45,11 +49,31 @@ public class FilmControllerTests {
     FilmController filmController;
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    FilmRowMapper filmRowMapper;
+    @Autowired
+    GenreRowMapper genreRowMapper;
+    @Autowired
+    UserRowMapper userRowMapper;
+    @Autowired
+    RatingRowMapper ratingRowMapper;
+
     @BeforeEach
     public void BeforeEach() {
-        filmController = new FilmController(new FilmService(new FilmDbStorage(jdbcTemplate),
+       /* filmController = new FilmController(new FilmService(new FilmDbStorage(jdbcTemplate),
                 new UserDbStorage(jdbcTemplate), new LikesDbStorage(jdbcTemplate),
-                new GenresDbStorage(jdbcTemplate), new RatingsDbStorage(jdbcTemplate)));
+                new GenresDbStorage(jdbcTemplate), new RatingsDbStorage(jdbcTemplate)));*/
+
+        filmController = new FilmController(
+                new FilmService(
+                        new FilmDbStorage(jdbcTemplate, filmRowMapper, genreRowMapper),
+                        new UserDbStorage(jdbcTemplate, userRowMapper),
+                        new LikesDbStorage(jdbcTemplate, filmRowMapper),
+                        new GenresDbStorage(jdbcTemplate, genreRowMapper),
+                        new RatingsDbStorage(jdbcTemplate, ratingRowMapper)
+                )
+        );
 
         jdbcTemplate.execute("delete from LIKES");
         jdbcTemplate.execute("delete from  film_genres");

@@ -1,19 +1,25 @@
 package ru.yandex.practicum.filmorate.storage.Friends;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserRowMapper;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class FriendsDbStorage implements FriendsStorage{
+    final UserRowMapper userRowMapper;
 
     private final JdbcTemplate jdbcTemplate;
-    public FriendsDbStorage(JdbcTemplate jdbcTemplate) {
+
+    public FriendsDbStorage(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userRowMapper = userRowMapper;
     }
 
     @Override
@@ -40,36 +46,23 @@ public class FriendsDbStorage implements FriendsStorage{
 
     @Override
     public List<User> getAllFriends(long id) {
-        List<User> friends = new ArrayList<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users, friendships " +
-                "where users.id = friendships.friend_id AND " +
-                "friendships.user_id = ?", id);
-        while (userRows.next()) {
-            User user = new User(userRows.getLong("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
-            friends.add(user);
-        }
-
+        String query = "SELECT u.id, u.email, u.login, u.name, u.birthday " +
+                "FROM users u " +
+                "INNER JOIN friendships f ON u.id = f.friend_id " +
+                "WHERE f.user_id = ?";
+        List<User> friends = jdbcTemplate.query(query, userRowMapper, id);
         return friends;
     }
 
     @Override
     public List<User> friendsOfBothUsers(long firstId, long secondId) {
-        List<User> friendsOfBoth = new ArrayList<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS AS U, FRIENDSHIPS AS F, FRIENDSHIPS AS O " +
+
+        String sql = "select * from USERS AS U, FRIENDSHIPS AS F, FRIENDSHIPS AS O " +
                 "where U.id = F.friend_id AND U.id = O.friend_id AND " +
-                "F.USER_ID = ? AND O.USER_ID = ?", firstId, secondId);
-        while (userRows.next()) {
-            User user = new User(userRows.getLong("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
-            friendsOfBoth.add(user);
-        }
+                "F.USER_ID = ? AND O.USER_ID = ?";
+        Object[] args = new Object[] { firstId, secondId };
+        int[] argTypes = new int[] { Types.BIGINT, Types.BIGINT }; // каждому типу данных соответствует целое число, в данном случае два одинаковых числа
+        List<User> friendsOfBoth = jdbcTemplate.query(sql, args, argTypes, userRowMapper);
         return friendsOfBoth;
     }
 }

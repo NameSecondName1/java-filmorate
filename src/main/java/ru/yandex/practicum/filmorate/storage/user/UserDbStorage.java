@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,16 +16,19 @@ import java.util.*;
 @Slf4j
 @Component
 public class UserDbStorage implements UserStorage {
+
+    final UserRowMapper userRowMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userRowMapper = userRowMapper;
     }
 
     @Override
     public List<User> getAllUsers() {
         String sql = "SELECT * FROM users ORDER BY id ASC";
-        return jdbcTemplate.query(sql, new UserRowMapper());
+        return jdbcTemplate.query(sql, userRowMapper);
     }
 
     @Override
@@ -68,7 +72,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         String sql = "select * from users where id = ?";
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+        User user = jdbcTemplate.queryForObject(sql, userRowMapper, id);
         return user;
     }
 
